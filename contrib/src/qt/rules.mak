@@ -145,9 +145,20 @@ endif
 	$(CMAKEINSTALL)
 	touch $@
 
+ifdef HAVE_MACOSX
+# VLC Remake: the AGL framework is gone from recent macOS SDKs but Qt records
+# it in the link information of its static libraries
+QT_DROP_AGL = find "$(PREFIX)/lib" "$(PREFIX)/mkspecs" -type f \( -name '*.prl' -o -name '*.pri' -o -name '*.cmake' \) \
+	-exec grep -l AGL {} + 2>/dev/null | while read f; do \
+	sed -i.agl -e 's/-framework AGL//g' -e 's/-framework;AGL//g' -e 's@[^ ";]*/AGL\.framework[^ ";]*@@g' "$$f" && rm -f "$$f.agl"; done
+else
+QT_DROP_AGL = true
+endif
+
 .qt: qt toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(QTBASE_CONFIG)
 	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
+	$(QT_DROP_AGL)
 	touch $@
