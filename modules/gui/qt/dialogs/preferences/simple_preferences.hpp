@@ -57,6 +57,13 @@ enum {
     SPrefsInputAndCodecs,
     SPrefsHotkeys,
     SPrefsMediaLibrary,
+    /* VLC redesign (Figma: Settings) categories built from config options */
+    SPrefsGeneral,
+    SPrefsPrivacy,
+    SPrefsNetwork,
+    SPrefsPerformance,
+    SPrefsRecording,
+    SPrefsExtensions,
     SPrefsMax
 };
 #define SPrefsDefaultCat SPrefsInterface
@@ -96,6 +103,13 @@ class SPrefsPanel : public QWidget
     Q_OBJECT
 public:
     SPrefsPanel( qt_intf_t *, QWidget *, int );
+
+    struct OptionSection
+    {
+        QString title;
+        QStringList options;
+        QString note;
+    };
     virtual ~SPrefsPanel();
     void apply();
 #ifdef _WIN32
@@ -107,6 +121,7 @@ private:
     void configGeneric(const char* option, QLabel* label, WidgetType* control);
     template<typename ControlType, typename WidgetType>
     void configGenericNoUi(const char* option, QLabel* label, WidgetType* control);
+    void buildOptionsPanel( QWidget *panel, const QList<OptionSection>& sections );
     void configBool(const char* option, QAbstractButton* control);
     template<typename T>
     void configGenericFile(const char* option, QLabel* label, QLineEdit* control, QPushButton* button);

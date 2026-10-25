@@ -56,6 +56,7 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QLabel>
+#include <QGroupBox>
 #include <QPushButton>
 #include <QGridLayout>
 #include <QWidget>
@@ -262,7 +263,9 @@ SPrefsCatList::SPrefsCatList( qt_intf_t *_p_intf, QWidget *_parent ) :
     };
 
     addGroup( qtr( "App" ) );
+    addCategory( qtr( "General" ), qtr( "General settings" ), VLCIcons::preferences, SPrefsGeneral );
     addCategory( qfut(INTF_TITLE), qfut(INTF_TOOLTIP), VLCIcons::prefs_interface, SPrefsInterface );
+    addCategory( qtr( "Privacy" ), qtr( "Privacy settings" ), VLCIcons::privacy, SPrefsPrivacy );
     addCategory( qtr( "Controls" ), qfut(HOTKEYS_TOOLTIP), VLCIcons::hotkeys, SPrefsHotkeys );
     addGroup( qtr( "Media" ) );
     addCategory( qtr( "Playback" ), qfut(INPUT_TOOLTIP), VLCIcons::play_filled, SPrefsInputAndCodecs );
@@ -271,11 +274,16 @@ SPrefsCatList::SPrefsCatList( qt_intf_t *_p_intf, QWidget *_parent ) :
     addCategory( qtr( "Subtitles" ), qfut(SUBPIC_TOOLTIP), VLCIcons::subtitles, SPrefsSubtitles );
     if ( vlc_ml_instance_get( p_intf ) != nullptr )
         addCategory( qtr( "Library" ), qfut(ML_TOOLTIP), VLCIcons::ic_fluent_folder_open_24_regular, SPrefsMediaLibrary );
+    addGroup( qtr( "System" ) );
+    addCategory( qtr( "Network" ), qtr( "Network settings" ), VLCIcons::topbar_network, SPrefsNetwork );
+    addCategory( qtr( "Performance" ), qtr( "Decoding and performance settings" ), VLCIcons::preferences, SPrefsPerformance );
+    addCategory( qtr( "Recording" ), qtr( "Recording settings" ), VLCIcons::record, SPrefsRecording );
+    addCategory( qtr( "Extensions" ), qtr( "Plugins and extensions" ), VLCIcons::plugins, SPrefsExtensions );
     layout->addStretch( 1 );
 
     qobject_cast<QToolButton*>(mapper->mapping(SPrefsInterface))->setChecked(true);
     layout->setContentsMargins( 6, 6, 6, 6 );
-    layout->setSpacing( 8 );
+    layout->setSpacing( 4 );
 
     setObjectName( "vlcPrefsSidebar" );
     setAttribute( Qt::WA_StyledBackground, true );
@@ -355,6 +363,48 @@ void SPrefsPanel::configGenericFile(const char* option, QLabel* label, QLineEdit
         if( button )
             button->setEnabled( false );
     }
+}
+
+/* VLC redesign: a page of sections, each listing config options with the
+ * control matching their type (the same controls as the advanced preferences) */
+void SPrefsPanel::buildOptionsPanel( QWidget *panel, const QList<OptionSection>& sections )
+{
+    QVBoxLayout *layout = new QVBoxLayout( panel );
+    layout->setContentsMargins( 0, 0, 0, 0 );
+    layout->setSpacing( 8 );
+
+    for( const OptionSection& section : sections )
+    {
+        QGroupBox *box = new QGroupBox( section.title, panel );
+        QGridLayout *grid = new QGridLayout( box );
+        grid->setColumnStretch( 0, 1 );
+        grid->setVerticalSpacing( 10 );
+        int line = 0;
+        for( const QString& option : section.options )
+        {
+            module_config_t *p_config = config_FindConfig( qtu( option ) );
+            /* skip unknown, platform specific and obsolete (unlabelled) options */
+            if( !p_config || !p_config->psz_text )
+                continue;
+            ConfigControl *control = ConfigControl::createControl( p_config, box, grid, line++ );
+            if( control )
+                controls.append( control );
+        }
+        if( !section.note.isEmpty() )
+        {
+            QLabel *note = new QLabel( section.note, box );
+            note->setWordWrap( true );
+            note->setStyleSheet( QStringLiteral( "color: %1;" ).arg( WidgetTheme::textTertiary().name() ) );
+            grid->addWidget( note, line++, 0, 1, grid->columnCount() > 0 ? grid->columnCount() : 1 );
+        }
+        if( line == 0 )
+        {
+            delete box;
+            continue;
+        }
+        layout->addWidget( box );
+    }
+    layout->addStretch( 1 );
 }
 
 void SPrefsPanel::configBool(const char* option, QAbstractButton* control)
@@ -1079,6 +1129,58 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.mlGroupBox->hide( );
             }
 
+            break;
+        }
+
+        /**************************************************
+         * VLC redesign categories (Figma: Settings)      *
+         **************************************************/
+        case SPrefsGeneral:
+            panel_label->setText( qtr( "General Preferences" ) );
+            buildOptionsPanel( panel, {
+                { qtr( "Startup" ), { "qt-continue", "auto-preparse" }, {} },
+                { qtr( "Window" ), { "qt-name-in-title" }, {} } } );
+            break;
+
+        case SPrefsPrivacy:
+            panel_label->setText( qtr( "Privacy Preferences" ) );
+            buildOptionsPanel( panel, {
+                { qtr( "History" ), { "qt-recentplay", "qt-recentplay-filter" },
+                  qtr( "Metadata network access and saving the recently played list are in Interface." ) },
+                { qtr( "Consent" ), { "qt-privacy-ask" }, {} } } );
+            break;
+
+        case SPrefsNetwork:
+            panel_label->setText( qtr( "Network Preferences" ) );
+            buildOptionsPanel( panel, {
+                { qtr( "Connection" ), { "http-proxy-pwd", "ipv4-timeout", "mtu" },
+                  qtr( "The HTTP proxy and network caching are in Playback." ) } } );
+            break;
+
+        case SPrefsPerformance:
+            panel_label->setText( qtr( "Performance Preferences" ) );
+            buildOptionsPanel( panel, {
+                { qtr( "Decoding" ), { "dec-dev", "codec", "avcodec-threads", "avcodec-hurry-up",
+                                       "avcodec-skip-frame", "avcodec-skip-idct" }, {} },
+                { qtr( "System" ), { "high-priority" }, {} } } );
+            break;
+
+        case SPrefsRecording:
+            panel_label->setText( qtr( "Recording Preferences" ) );
+            buildOptionsPanel( panel, {
+                { qtr( "Recording" ), { "input-record-native" },
+                  qtr( "The recording folder is in Playback, the snapshot options in Video." ) } } );
+            break;
+
+        case SPrefsExtensions:
+        {
+            panel_label->setText( qtr( "Extensions Preferences" ) );
+            buildOptionsPanel( panel, {
+                { qtr( "Plugins" ), { "plugins-cache" }, {} } } );
+            QPushButton *manage = new QPushButton( qtr( "Manage plugins and extensions..." ), panel );
+            connect( manage, &QPushButton::clicked, DialogsProvider::getInstance(), &DialogsProvider::pluginDialog );
+            if ( auto box = qobject_cast<QBoxLayout*>( panel->layout() ) )
+                box->insertWidget( box->count() - 1, manage, 0, Qt::AlignLeft );
             break;
         }
     }
