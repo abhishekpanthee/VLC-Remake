@@ -86,6 +86,7 @@ class PlaylistsDialog;
 class BookmarksDialog;
 class PodcastConfigDialog;
 class PluginDialog;
+class AddSubtitlesDialog;
 class EpgDialog;
 class UpdateDialog;
 class PrefsDialog;
@@ -184,6 +185,7 @@ private:
     std::unique_ptr<BookmarksDialog> m_bookmarkDialog;
     std::unique_ptr<PodcastConfigDialog> m_podcastDialog;
     std::unique_ptr<PluginDialog> m_pluginDialog;
+    std::unique_ptr<AddSubtitlesDialog> m_addSubtitlesDialog;
     std::unique_ptr<EpgDialog> m_egpDialog;
 #ifdef UPDATE_CHECK
     std::unique_ptr<UpdateDialog> m_updateDialog;

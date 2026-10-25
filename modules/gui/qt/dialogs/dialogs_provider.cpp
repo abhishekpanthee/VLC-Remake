@@ -32,6 +32,7 @@
 
 #include "qt.hpp"
 #include "dialogs_provider.hpp"
+#include "dialogs/subtitles/addsubtitles.hpp"
 #include "player/player_controller.hpp" /* Load Subtitles */
 #include "playlist/playlist_controller.hpp"
 #include "menus/menus.hpp"
@@ -997,7 +998,12 @@ void  DialogsProvider::loadMediaFile( const es_format_category_e category, const
 
 void DialogsProvider::loadSubtitlesFile()
 {
-    loadMediaFile( SPU_ES, EXT_FILTER_SUBTITLE, qtr( "Open subtitles..." ) );
+    /* VLC redesign (Figma: Add Subtitles) */
+    ensureDialog( m_addSubtitlesDialog );
+    m_addSubtitlesDialog->refresh();
+    m_addSubtitlesDialog->show();
+    m_addSubtitlesDialog->raise();
+    m_addSubtitlesDialog->activateWindow();
 }
 
 void DialogsProvider::loadAudioFile()

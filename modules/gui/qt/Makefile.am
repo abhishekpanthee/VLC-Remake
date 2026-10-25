@@ -137,6 +137,7 @@ libqt_plugin_la_SOURCES = \
 	dialogs/open/open_panels.cpp dialogs/open/open_panels.hpp \
 	dialogs/open/openurl.cpp dialogs/open/openurl.hpp \
 	dialogs/plugins/plugins.cpp dialogs/plugins/plugins.hpp \
+	dialogs/subtitles/addsubtitles.cpp dialogs/subtitles/addsubtitles.hpp \
 	dialogs/podcast/podcast_configuration.cpp \
 	dialogs/podcast/podcast_configuration.hpp \
 	dialogs/preferences/complete_preferences.cpp \
@@ -430,6 +431,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/open/open_panels.moc.cpp \
 	dialogs/open/openurl.moc.cpp \
 	dialogs/plugins/plugins.moc.cpp \
+	dialogs/subtitles/addsubtitles.moc.cpp \
 	dialogs/podcast/podcast_configuration.moc.cpp \
 	dialogs/preferences/complete_preferences.moc.cpp \
 	dialogs/preferences/expert_model.moc.cpp \
