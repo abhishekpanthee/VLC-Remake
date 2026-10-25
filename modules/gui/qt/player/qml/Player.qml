@@ -1329,6 +1329,9 @@ FocusScope {
         // VLC redesign: single 54px row with the seek bar inlined
         textPosition: ControlBar.TimeTextPosition.Inline
 
+        // Figma: Player - Music
+        waveformSeekBar: !Player.hasVideoOutput
+
         rightPadding: VLCStyle.applicationHorizontalMargin + (_inline ? VLCStyle.controlBar_horizontalPadding : 0)
         leftPadding: VLCStyle.applicationHorizontalMargin + (_inline ? VLCStyle.controlBar_horizontalPadding : 0)
         topPadding: _inline ? VLCStyle.controlBar_verticalPadding : 0

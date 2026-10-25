@@ -68,6 +68,9 @@ T.Pane {
     property real bookmarksHeight: VLCStyle.controlBarBookmarksHeight
     property bool showRemainingTime: true
 
+    // VLC redesign: waveform-like seek bar (audio media)
+    property bool waveformSeekBar: false
+
     property var menu: undefined
 
     signal requestLockUnlockAutoHide(bool lock)
@@ -251,6 +254,7 @@ T.Pane {
 
                 barHeight: root._inline ? VLCStyle.seekBar_height : root.sliderHeight
                 blockStyle: root._inline
+                waveform: root._inline && root.waveformSeekBar
 
                 Accessible.role: Accessible.Slider
                 Accessible.name: qsTr("Progress")

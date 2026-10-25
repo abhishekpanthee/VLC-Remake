@@ -35,6 +35,13 @@ T.ProgressBar {
     // track, an inset dimmed-accent played part and a 8px wide accent handle
     // at the end of the played part
     property bool blockStyle: false
+
+    // VLC redesign (Figma: Player - Music): with the block style, draw the
+    // track as waveform-like bars. NOTE: VLC has no audio levels for the whole
+    // media, the bar heights are derived from the media identity, so each
+    // media keeps a stable shape; it is a visual treatment, not a level meter.
+    property bool waveform: false
+    property string waveformSeed: Player.title
     readonly property real _inset: blockStyle ? VLCStyle.seekBar_inset : 0
     readonly property real _blockInnerHeight: barHeight - 2 * _inset
     readonly property real _scaledBarHeight: control.barHeight * _hoveredScalingFactor
@@ -434,6 +441,81 @@ T.ProgressBar {
             }
         }
 
+        Item {
+            id: waveformTrack
+
+            readonly property int barWidth: VLCStyle.dp(2, VLCStyle.scale)
+            readonly property int barGap: VLCStyle.dp(3, VLCStyle.scale)
+
+            visible: control.blockStyle && control.waveform
+            x: control._inset * 4
+            y: control._inset
+            width: parent.width - control._inset * 8
+            height: control._blockInnerHeight
+
+            // pseudo random but stable heights for the media (0.2 .. 1.0)
+            function barHeights(count, seed) {
+                let h = 2166136261
+                for (let i = 0; i < seed.length; ++i)
+                    h = Math.imul(h ^ seed.charCodeAt(i), 16777619) >>> 0
+                const heights = []
+                let previous = 0.5
+                for (let i = 0; i < count; ++i) {
+                    h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0
+                    h = Math.imul(h ^ (h >>> 13), 3266489909) >>> 0
+                    const r = ((h ^ (h >>> 16)) >>> 0) / 4294967296
+                    previous = previous * 0.55 + r * 0.45
+                    heights.push(0.2 + previous * 0.8)
+                }
+                return heights
+            }
+
+            readonly property var heights: barHeights(Math.max(1, Math.floor(width / (barWidth + barGap))),
+                                                      control.waveformSeed || "vlc")
+
+            component WaveformBars: Canvas {
+                property color barColor
+
+                width: waveformTrack.width
+                height: waveformTrack.height
+
+                onBarColorChanged: requestPaint()
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+                Connections {
+                    target: waveformTrack
+                    function onHeightsChanged() { requestPaint() }
+                }
+
+                onPaint: {
+                    const ctx = getContext("2d")
+                    ctx.reset()
+                    ctx.fillStyle = barColor
+                    const heights = waveformTrack.heights
+                    const step = waveformTrack.barWidth + waveformTrack.barGap
+                    for (let i = 0; i < heights.length; ++i) {
+                        const h = Math.max(1, heights[i] * height * 0.8)
+                        ctx.fillRect(i * step, (height - h) / 2, waveformTrack.barWidth, h)
+                    }
+                }
+            }
+
+            WaveformBars {
+                barColor: theme.palette.isDark ? Qt.rgba(1, 1, 1, 0.22) : Qt.rgba(0, 0, 0, 0.22)
+            }
+
+            // the played part, clipped to the playback position
+            Item {
+                clip: true
+                width: Math.max(0, control.visualPosition * (control.availableWidth - control._inset * 2) - control._inset * 3)
+                height: parent.height
+
+                WaveformBars {
+                    barColor: theme.fg.primary
+                }
+            }
+        }
+
         Rectangle {
             id: progressRect
             x: control._inset
@@ -442,7 +524,8 @@ T.ProgressBar {
                    ? Math.max(VLCStyle.seekBar_handleWidth, control.visualPosition * (parent.width - 2 * control._inset))
                    : control.visualPosition * parent.width
             visible: control.blockStyle || !Player.hasChapters
-            color: control.blockStyle ? theme.bg.secondary : theme.fg.primary
+            // with the waveform, the played bars show the progress
+            color: control.blockStyle ? (control.waveform ? "transparent" : theme.bg.secondary) : theme.fg.primary
             height: control.blockStyle ? control._blockInnerHeight : control.barHeight
             radius: control.blockStyle ? VLCStyle.radius_small : control._seekPointsRadius
 
