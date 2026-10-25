@@ -111,8 +111,56 @@ public:
     Q_PROPERTY(CSDMetrics* csdMetrics READ getCSDMetrics NOTIFY CSDMetricsChanged FINAL)
 
     //standard color definitions used by light/dark themes
-    COLOR_DEFINITION(orange500, "#FF8800");
-    COLOR_DEFINITION(orange800, "#FF610A");
+    // orange500 / orange800 are the accent "Main" / "Bright" tokens of the
+    // VLC redesign (Figma: Dark/Accent/Main, Dark/Accent/Bright). They are
+    // overridden by the qt-accent-color option.
+    COLOR_DEFINITION(orange500, "#D37918");
+    COLOR_DEFINITION(orange800, "#FC9729");
+    // light theme accent (Figma: Light/Accent/Main, Light/Accent/Bright)
+    COLOR_DEFINITION(lightAccentMain, "#E8851A");
+    COLOR_DEFINITION(lightAccentBright, "#FFA13B");
+
+    // VLC redesign tokens - dark theme (Figma "Dark/...")
+    COLOR_DEFINITION(dBgA1, "#222222");
+    COLOR_DEFINITION(dBgA2, "#1F1F1F");
+    COLOR_DEFINITION(dBgA3, "#1B1B1B");
+    COLOR_DEFINITION(dBgA4, "#191919");
+    COLOR_DEFINITION(dBgA5, "#151515");
+    COLOR_DEFINITION(dBgB1, "#0E0E0E");
+    COLOR_DEFINITION(dBgB2, "#090909");
+    COLOR_DEFINITION(dBgAccentDark, "#1A1611");
+    COLOR_DEFINITION(dFg1, "#EAEAEA");
+    COLOR_DEFINITION(dFg2, "#C6C6C6");
+    COLOR_DEFINITION(dFgA1, "#969696");
+    COLOR_DEFINITION(dFgA2, "#8F8F8F");
+    COLOR_DEFINITION(dFgA3, "#6B6B6B");
+    COLOR_DEFINITION(dFgA4, "#404040");
+    COLOR_DEFINITION(dFgB1, "#161616");
+    COLOR_DEFINITION(dDividerBright, "#373737");
+    COLOR_DEFINITION(dDividerDim, "#222222");
+
+    // VLC redesign tokens - light theme (Figma "Light/...")
+    COLOR_DEFINITION(lBgA1, "#EDEDED");
+    COLOR_DEFINITION(lBgA2, "#DDDDDD");
+    COLOR_DEFINITION(lBgA3, "#D5D5D5");
+    COLOR_DEFINITION(lBgA4, "#B3B3B3");
+    COLOR_DEFINITION(lBgA5, "#888888");
+    COLOR_DEFINITION(lBgB1, "#E7E7E7");
+    COLOR_DEFINITION(lBgB2, "#DEDEDE");
+    COLOR_DEFINITION(lBgAccentBright, "#D8BA9A");
+    COLOR_DEFINITION(lBgAccentDark, "#C6AB89");
+    COLOR_DEFINITION(lFgA1, "#3C3C3C");
+    COLOR_DEFINITION(lFgA2, "#2E2E2E");
+    COLOR_DEFINITION(lFgA3, "#6B6B6B");
+    COLOR_DEFINITION(lFgA4, "#3B3B3B");
+    COLOR_DEFINITION(lFgB1, "#161616");
+    COLOR_DEFINITION(lDividerBright, "#9B9B9B");
+    COLOR_DEFINITION(lDividerDim, "#ACACAC");
+
+    // volume meter gradient (Figma: volume "Rectangle 6")
+    COLOR_DEFINITION(volumeLow, "#95D318");
+    COLOR_DEFINITION(volumeMid, "#D37918");
+    COLOR_DEFINITION(volumeHigh, "#FF3737");
 
     COLOR_DEFINITION(orange400, "#f89a06"); //FIXME name have been chosen randomly by me
     COLOR_DEFINITION(orange200, "#e29a06"); //FIXME name have been chosen randomly by me
@@ -177,6 +225,8 @@ private:
 
     ColorSchemeModel::ColorScheme m_source = ColorSchemeModel::ColorScheme::Day;
     bool m_isDark = false;
+    // true when qt-accent-color overrides the default accent
+    bool m_customAccent = false;
     bool m_hasCSDImage = false;
 
     std::unique_ptr<ExternalPaletteImpl> m_palettePriv;

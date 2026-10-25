@@ -791,6 +791,10 @@ ui_%.h: %.ui
 
 libqt_plugin_la_RES = \
 	pixmaps/VLCIcons.ttf \
+	pixmaps/fonts/Inter-Regular.otf \
+	pixmaps/fonts/Inter-Medium.otf \
+	pixmaps/fonts/Inter-SemiBold.otf \
+	pixmaps/fonts/Inter-Light.otf \
 	pixmaps/addons/addon_default.svg \
 	pixmaps/addons/addon_broken.svg \
 	pixmaps/addons/addon_blue.svg \

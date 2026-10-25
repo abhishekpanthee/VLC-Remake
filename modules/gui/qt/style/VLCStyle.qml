@@ -26,14 +26,14 @@ QtObject {
 
     readonly property real scale: MainCtx.intfScaleFactor
 
-    readonly property FontMetrics fontMetrics_xxsmall  : FontMetrics { font.pixelSize: MainCtx.dp(6, scale);  }
-    readonly property FontMetrics fontMetrics_xsmall   : FontMetrics { font.pixelSize: MainCtx.dp(8, scale);  }
-    readonly property FontMetrics fontMetrics_small    : FontMetrics { font.pixelSize: MainCtx.dp(10, scale); }
-    readonly property FontMetrics fontMetrics_normal   : FontMetrics { font.pixelSize: MainCtx.dp(12, scale); }
-    readonly property FontMetrics fontMetrics_large    : FontMetrics { font.pixelSize: MainCtx.dp(14, scale); }
+    readonly property FontMetrics fontMetrics_xxsmall  : FontMetrics { font.pixelSize: MainCtx.dp(7, scale);  }
+    readonly property FontMetrics fontMetrics_xsmall   : FontMetrics { font.pixelSize: MainCtx.dp(10, scale);  }
+    readonly property FontMetrics fontMetrics_small    : FontMetrics { font.pixelSize: MainCtx.dp(12, scale); }
+    readonly property FontMetrics fontMetrics_normal   : FontMetrics { font.pixelSize: MainCtx.dp(14, scale); }
+    readonly property FontMetrics fontMetrics_large    : FontMetrics { font.pixelSize: MainCtx.dp(15, scale); }
     readonly property FontMetrics fontMetrics_xlarge   : FontMetrics { font.pixelSize: MainCtx.dp(16, scale); }
     readonly property FontMetrics fontMetrics_xxlarge  : FontMetrics { font.pixelSize: MainCtx.dp(20, scale); }
-    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: MainCtx.dp(24, scale); }
+    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: MainCtx.dp(32, scale); }
 
     readonly property SystemPalette palette:  SystemPalette {
         objectName: "themePalette"
@@ -115,7 +115,7 @@ QtObject {
     readonly property int icon_track: icon_normal
     readonly property int icon_tableHeader: icon_normal
     readonly property int icon_playlistHeader: icon_normal
-    readonly property int icon_banner: MainCtx.dp(28, scale)
+    readonly property int icon_banner: MainCtx.dp(24, scale)
     readonly property int icon_play: MainCtx.dp(28, scale)
     readonly property int icon_addressBar: icon_normal
     readonly property int icon_actionButton: icon_normal
@@ -177,6 +177,33 @@ QtObject {
 
     readonly property real button_radius: MainCtx.dp(4, scale)
 
+    // VLC redesign corner radii (Figma: 2 = chips/tracks, 4 = buttons & fields,
+    // 6 = panels & menus, 10 = dialogs)
+    readonly property real radius_xsmall: MainCtx.dp(2, scale)
+    readonly property real radius_small: MainCtx.dp(4, scale)
+    readonly property real radius_normal: MainCtx.dp(6, scale)
+    readonly property real radius_large: MainCtx.dp(10, scale)
+
+    // VLC redesign control sizes (Figma: "Icon Wrapper" 30x32, Button/Dropdown 32px high)
+    readonly property int iconWrapper_width: MainCtx.dp(30, scale)
+    readonly property int iconWrapper_height: MainCtx.dp(32, scale)
+    readonly property int control_height: MainCtx.dp(32, scale)
+
+    // VLC redesign player control bar (Figma: "Controls" 54px high)
+    readonly property int controlBar_verticalPadding: MainCtx.dp(11, scale)
+    readonly property int controlBar_horizontalPadding: MainCtx.dp(20, scale)
+    readonly property int controlBar_groupSpacing: MainCtx.dp(20, scale)
+    readonly property int controlBar_controlSpacing: MainCtx.dp(12, scale)
+    readonly property int controlBar_contentHeight: MainCtx.dp(32, scale)
+    readonly property int seekBar_height: MainCtx.dp(28, scale)
+    readonly property int seekBar_inset: MainCtx.dp(2, scale)
+    readonly property int seekBar_handleWidth: MainCtx.dp(8, scale)
+    readonly property int timeLabel_width: MainCtx.dp(76, scale)
+    readonly property int playPill_width: MainCtx.dp(54, scale)
+    readonly property int playPill_height: MainCtx.dp(28, scale)
+    readonly property int volumeMeter_width: MainCtx.dp(88, scale)
+    readonly property int volumeMeter_height: MainCtx.dp(28, scale)
+
     readonly property int contextButton_width: icon_normal
     readonly property int contextButton_margin: margin_xxsmall
 
@@ -212,7 +239,7 @@ QtObject {
 
     readonly property int artistGridCover_radius: MainCtx.dp(90, scale)
 
-    readonly property real mainView_topLeftRadius: MainCtx.dp(8, scale)
+    readonly property real mainView_topLeftRadius: MainCtx.dp(6, scale)
 
     //GridItem
     readonly property int gridItemTitle_topMargin: margin_xsmall + margin_xxxsmall
@@ -324,7 +351,7 @@ QtObject {
     readonly property int controlBarBookmarksHeight: icon_xsmall * 0.9
 
     // Player control layout
-    readonly property int controlLayoutHeight: MainCtx.dp(64, scale)
+    readonly property int controlLayoutHeight: MainCtx.dp(54, scale)
     readonly property int controlLayoutHeightPinned: MainCtx.dp(32, scale)
 
     // Scroll bar (size means width or height, depending on the orientation):

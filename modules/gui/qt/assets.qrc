@@ -100,6 +100,10 @@
     </qresource>
     <qresource prefix="/">
         <file alias="VLCIcons.ttf">pixmaps/VLCIcons.ttf</file>
+        <file alias="fonts/Inter-Regular.otf">pixmaps/fonts/Inter-Regular.otf</file>
+        <file alias="fonts/Inter-Medium.otf">pixmaps/fonts/Inter-Medium.otf</file>
+        <file alias="fonts/Inter-SemiBold.otf">pixmaps/fonts/Inter-SemiBold.otf</file>
+        <file alias="fonts/Inter-Light.otf">pixmaps/fonts/Inter-Light.otf</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="advprefs_audio.svg">pixmaps/prefs/advprefs_audio.svg</file>
