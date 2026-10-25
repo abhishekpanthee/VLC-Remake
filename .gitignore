@@ -63,3 +63,7 @@ static-lib/
 !buildsystem/
 !build.rs
 !extras/package/apple/build.sh
+
+# VLC Remake: local macOS builds and packages
+/build-mac*/
+/dist/
