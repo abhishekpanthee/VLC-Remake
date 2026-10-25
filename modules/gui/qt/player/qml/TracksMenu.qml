@@ -33,11 +33,12 @@ T.Popup {
     // Settings
     property var preferredWidth : stackView.currentItem.preferredWidth
 
+    // VLC redesign (Figma: track panel 400x524)
     width: Math.min((typeof preferredWidth !== "undefined")
-                          ? preferredWidth : Number.MAX_VALUE
+                          ? preferredWidth : VLCStyle.tracksPanel_width
                     , root.parent.width)
 
-    height: VLCStyle.dp(296, VLCStyle.scale)
+    height: Math.min(VLCStyle.tracksPanel_height, root.parent.height - VLCStyle.margin_large * 2)
 
     // Animations
 
@@ -57,16 +58,10 @@ T.Popup {
 
     background: Rectangle {
         // NOTE: The opacity should be stronger on a light background for readability.
-        color: popupTheme.bg.primary.alpha(popupTheme.palette.isDark ? 0.8 : 0.96)
+        // Figma: Dark/BG/B1 Transparent, 10px radius
+        color: popupTheme.bg.primary.alpha(popupTheme.palette.isDark ? 0.95 : 0.96)
+        radius: VLCStyle.radius_large
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            height: VLCStyle.margin_xxxsmall
-
-            color: popupTheme.border
-        }
     }
 
     contentItem: T.StackView {

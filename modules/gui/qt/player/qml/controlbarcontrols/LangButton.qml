@@ -65,8 +65,9 @@ Widgets.IconToolButton {
 
             parent: root._parentItem
 
-            x: 0
-            y: (parent.positionSliderY - height)
+            // VLC redesign: a floating panel above the control bar, on the right
+            x: parent.width - width - VLCStyle.controlBar_horizontalPadding
+            y: (parent.positionSliderY - height - VLCStyle.margin_xsmall)
             z: 1
 
             focus: true

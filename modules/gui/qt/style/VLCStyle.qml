@@ -221,6 +221,9 @@ QtObject {
     readonly property int editorItem_height: MainCtx.dp(76, scale)
     readonly property int editorItem_boxSize: MainCtx.dp(28, scale)
 
+    readonly property int tracksPanel_width: MainCtx.dp(400, scale)
+    readonly property int tracksPanel_height: MainCtx.dp(524, scale)
+
     readonly property int volumeMeter_width: MainCtx.dp(88, scale)
     readonly property int volumeMeter_height: MainCtx.dp(28, scale)
 

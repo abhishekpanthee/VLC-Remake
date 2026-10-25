@@ -29,7 +29,9 @@ import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Dialogs
 
-RowLayout {
+// VLC redesign (Figma: Controls / subtitles, audio, video): tabs for the
+// track types above a single track list and a "Show Preferences" footer
+ColumnLayout {
     id: root
 
     readonly property ColorContext colorContext: ColorContext {
@@ -41,68 +43,165 @@ RowLayout {
     //FIXME make TrackMenuController a proper type (see TrackMenu)
     required property QtObject trackMenuController
 
+    // the tab shown when the panel opens: 0 video, 1 audio, 2 subtitles
+    property int currentTab: 2
+
     spacing: 0
 
     focus: true
 
-    onActiveFocusChanged: if (activeFocus) playbackBtn.forceActiveFocus()
+    onActiveFocusChanged: if (activeFocus) tabRow.forceActiveFocus()
 
-    Widgets.ButtonExt {
-        id: playbackBtn
+    // tab header (Figma: 50px, Dark/BG/B2)
+    Rectangle {
+        Layout.fillWidth: true
+        Layout.preferredHeight: VLCStyle.dp(50, VLCStyle.scale)
 
-        text: qsTr("%1x").arg(+Player.rate.toFixed(2))
+        color: theme.bg.secondary
+        // rounded top corners only (per-corner radii require Qt 6.7)
+        radius: VLCStyle.radius_large
 
-        onPressed: {
-            trackMenuController.requestPlaybackSpeedPage()
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: parent.radius
+            color: parent.color
         }
 
-        T.ToolTip.visible: (hovered || visualFocus)
-        T.ToolTip.text: qsTr("Playback Speed")
-        T.ToolTip.delay: VLCStyle.delayToolTipAppear
+        Widgets.NavigableRow {
+            id: tabRow
 
-        Navigation.parentItem: root
-        Navigation.rightItem: row
+            anchors.fill: parent
+            anchors.leftMargin: VLCStyle.dp(6, VLCStyle.scale)
+            anchors.rightMargin: VLCStyle.dp(6, VLCStyle.scale)
 
-        Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-        Layout.margins: VLCStyle.margin_large
+            focus: true
+            Navigation.parentItem: root
+            Navigation.downItem: tracksStack
+
+            TabHeaderButton {
+                text: qsTr("Playback")
+                iconText: VLCIcons.play_filled
+                checked: false
+                onClicked: trackMenuController.requestPlaybackSpeedPage()
+            }
+            TabHeaderButton {
+                text: qsTr("Video")
+                iconText: VLCIcons.topbar_video
+                checked: root.currentTab === 0
+                onClicked: root.currentTab = 0
+            }
+            TabHeaderButton {
+                text: qsTr("Audio")
+                iconText: VLCIcons.audio
+                checked: root.currentTab === 1
+                onClicked: root.currentTab = 1
+            }
+            TabHeaderButton {
+                text: qsTr("Subtitles")
+                iconText: VLCIcons.subtitles
+                checked: root.currentTab === 2
+                onClicked: root.currentTab = 2
+            }
+        }
     }
 
-    Widgets.NavigableRow {
-        id: row
+    StackLayout {
+        id: tracksStack
 
-        Layout.fillHeight: true
         Layout.fillWidth: true
+        Layout.fillHeight: true
 
-        Navigation.leftItem: playbackBtn
-
-        TrackColumn {
-            title: qsTr("Subtitle")
-            tracksModel: Player.subtitleTracks
-            menuIcon: VLCIcons.expand
-            menuText: qsTr("Menu")
-            onMenuAction: (menuPos)  => {
-                menuSubtitle.popup(menuPos)
-            }
-        }
+        currentIndex: root.currentTab
 
         TrackColumn {
-            title: qsTr("Audio")
-            tracksModel: Player.audioTracks
-            menuIcon: VLCIcons.expand
-            menuText: qsTr("Menu")
-            onMenuAction: (menuPos)  => {
-                menuAudio.popup(menuPos)
-            }
-        }
-
-        TrackColumn {
-            title: qsTr("Video Tracks")
+            title: qsTr("Embedded Tracks")
             tracksModel: Player.videoTracks
             menuIcon: VLCIcons.add
             menuText: qsTr("Add")
             onMenuAction: (menuPos) => {
                 DialogsProvider.loadVideoFile()
             }
+        }
+        TrackColumn {
+            title: qsTr("Embedded Tracks")
+            tracksModel: Player.audioTracks
+            menuIcon: VLCIcons.ellipsis
+            menuText: qsTr("Menu")
+            onMenuAction: (menuPos)  => {
+                menuAudio.popup(menuPos)
+            }
+        }
+        TrackColumn {
+            title: qsTr("Embedded Tracks")
+            tracksModel: Player.subtitleTracks
+            menuIcon: VLCIcons.ellipsis
+            menuText: qsTr("Menu")
+            onMenuAction: (menuPos)  => {
+                menuSubtitle.popup(menuPos)
+            }
+        }
+    }
+
+    // footer (Figma: "Show Preferences" 360x32 button)
+    Widgets.ButtonExt {
+        Layout.fillWidth: true
+        Layout.margins: VLCStyle.margin_normal + VLCStyle.margin_xxsmall
+        Layout.preferredHeight: VLCStyle.control_height
+
+        text: qsTr("Show Preferences")
+        font.pixelSize: VLCStyle.fontSize_normal
+
+        onClicked: DialogsProvider.prefsDialog()
+    }
+
+    component TabHeaderButton: T.AbstractButton {
+        id: tab
+
+        property string iconText
+
+        Layout.fillWidth: true
+        implicitHeight: VLCStyle.dp(50, VLCStyle.scale)
+        implicitWidth: tabContent.implicitWidth + VLCStyle.margin_normal
+        height: parent ? parent.height : implicitHeight
+        width: parent ? (parent.width / 4) : implicitWidth
+
+        focusPolicy: Qt.StrongFocus
+
+        Navigation.parentItem: tabRow
+
+        Row {
+            id: tabContent
+
+            anchors.centerIn: parent
+            spacing: VLCStyle.margin_xsmall
+
+            Widgets.IconLabel {
+                anchors.verticalCenter: parent.verticalCenter
+                text: tab.iconText
+                font.pixelSize: VLCStyle.icon_normal
+                color: (tab.checked || tab.hovered) ? theme.fg.primary : theme.fg.secondary
+            }
+
+            T.Label {
+                anchors.verticalCenter: parent.verticalCenter
+                text: tab.text
+                font.pixelSize: VLCStyle.fontSize_small
+                color: (tab.checked || tab.hovered) ? theme.fg.primary : theme.fg.secondary
+            }
+        }
+
+        // active tab underline (Figma: 2px accent)
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: VLCStyle.margin_xsmall
+            anchors.bottomMargin: 0
+            height: VLCStyle.dp(2, VLCStyle.scale)
+            color: theme.accent
+            visible: tab.checked
         }
     }
 
@@ -126,13 +225,12 @@ RowLayout {
 
         focus: true
 
-        width: row.width / 3
-        height: row.height
+        // sized by the StackLayout
 
         onActiveFocusChanged: if (activeFocus) tracksList.forceActiveFocus(focusReason)
 
         // this is required to initialize attached Navigation property
-        Navigation.parentItem: row
+        Navigation.parentItem: tracksStack
 
         contentItem: Column {
             anchors.fill: parent
@@ -178,7 +276,9 @@ RowLayout {
                            - parent.rightPadding
 
                     text: tracksListContainer.title
-                    color: theme.fg.primary
+                    color: theme.fg.secondary
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Widgets.IconTrackButton {
@@ -227,10 +327,11 @@ RowLayout {
                     focus: true
                     text: model.display
                     width: tracksListContainer.width - VLCStyle.margin_xxxsmall
-                    height: VLCStyle.dp(40, VLCStyle.scale)
-                    opacity: hovered || activeFocus || checked ? 1 : .6
-                    font.weight: hovered
-                                 || activeFocus ? Font.DemiBold : Font.Normal
+                    // Figma: 32px rows with 12px spacing, 14px Dark/FG/A1
+                    height: VLCStyle.dp(44, VLCStyle.scale)
+                    leftPadding: VLCStyle.margin_large
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    font.weight: Font.Normal
 
                     onIsModelCheckedChanged: {
                         if (model.checked !== checked)
