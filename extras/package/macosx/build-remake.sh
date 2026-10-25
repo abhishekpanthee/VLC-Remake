@@ -50,6 +50,13 @@ cd "$BUILD"
 test -f Makefile || { echo "VLC was not configured, see the errors above"; exit 1; }
 grep -q "^ENABLE_QT_TRUE=''" config.log || { echo "Qt was not found: the redesigned interface would be missing"; exit 1; }
 
+# the tools VLC built (nasm for the Intel assembly, ...) for the steps below,
+# which run outside of build.sh
+export PATH="$ROOT/extras/tools/build/bin:$BUILD/contrib/bin:$PATH"
+if [ "$ARCH" = x86_64 ] && ! command -v nasm >/dev/null 2>&1; then
+    echo "nasm not found (needed for Intel): brew install nasm"; exit 1
+fi
+
 # configure loses the SDK of the Objective-C compilers with recent Xcode
 SDK="$(xcrun --sdk macosx --show-sdk-path)"
 FIX="OBJC=$(xcrun --find clang) -isysroot $SDK -mmacosx-version-min=$VLC_MINIMAL_OSX_VERSION"
