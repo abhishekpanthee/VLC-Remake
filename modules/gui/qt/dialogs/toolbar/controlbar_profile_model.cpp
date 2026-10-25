@@ -128,9 +128,9 @@ decltype (ControlbarProfileModel::m_defaults)
                                 // VLC redesign (Figma: Player - Music)
                                 {
                                     ControlListModel::PREVIOUS_BUTTON,
-                                    ControlListModel::SKIP_BACK_BUTTON,
+                                    ControlListModel::SKIP_BACK_15_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
-                                    ControlListModel::SKIP_FW_BUTTON,
+                                    ControlListModel::SKIP_FW_15_BUTTON,
                                     ControlListModel::NEXT_BUTTON
                                 },
                                 {

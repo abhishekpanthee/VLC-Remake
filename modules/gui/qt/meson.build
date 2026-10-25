@@ -807,6 +807,8 @@ qml_modules += {
        'player/qml/controlbarcontrols/ReverseButton.qml',
        'player/qml/controlbarcontrols/SkipBackButton.qml',
        'player/qml/controlbarcontrols/SkipForwardButton.qml',
+       'player/qml/controlbarcontrols/SkipBack15Button.qml',
+       'player/qml/controlbarcontrols/SkipForward15Button.qml',
        'player/qml/controlbarcontrols/SlowerButton.qml',
        'player/qml/controlbarcontrols/SnapshotButton.qml',
        'player/qml/controlbarcontrols/SpacerWidget.qml',

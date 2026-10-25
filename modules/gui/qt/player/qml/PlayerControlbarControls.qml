@@ -48,6 +48,8 @@ QtObject {
         { id: ControlListModel.REVERSE_BUTTON, file: "ReverseButton.qml", label: VLCIcons.play_reverse, text: qsTr("Trickplay Reverse") },
         { id: ControlListModel.SKIP_BACK_BUTTON, file: "SkipBackButton.qml", label: VLCIcons.skip_back, text: qsTr("Step backward") },
         { id: ControlListModel.SKIP_FW_BUTTON, file: "SkipForwardButton.qml", label: VLCIcons.skip_for, text: qsTr("Step forward") },
+        { id: ControlListModel.SKIP_BACK_15_BUTTON, file: "SkipBack15Button.qml", label: VLCIcons.skip_back_15, text: qsTr("Backward 15s") },
+        { id: ControlListModel.SKIP_FW_15_BUTTON, file: "SkipForward15Button.qml", label: VLCIcons.skip_for_15, text: qsTr("Forward 15s") },
         { id: ControlListModel.QUIT_BUTTON, file: "QuitButton.qml", label: VLCIcons.clear, text: qsTr("Quit") },
         { id: ControlListModel.RANDOM_BUTTON, file: "RandomButton.qml", label: VLCIcons.shuffle, text: qsTr("Random") },
         { id: ControlListModel.LOOP_BUTTON, file: "LoopButton.qml", label: VLCIcons.repeat_all, text: qsTr("Loop") },

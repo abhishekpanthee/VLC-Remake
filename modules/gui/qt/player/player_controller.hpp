@@ -239,6 +239,8 @@ public slots:
     void normalRate();
 
     void jumpFwd();
+    /// VLC redesign: jump by a fixed number of seconds (negative to rewind)
+    void jumpBy(int seconds);
     void jumpBwd();
     void jumpTime( VLCTime i_time );
     void jumpToPos( double );
