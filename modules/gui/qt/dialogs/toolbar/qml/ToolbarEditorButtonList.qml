@@ -37,8 +37,9 @@ GridView {
     currentIndex: -1
     highlightFollowsCurrentItem: false
 
-    cellWidth: VLCStyle.cover_small
-    cellHeight: cellWidth
+    // VLC redesign (Figma: Customize Player grid)
+    cellWidth: VLCStyle.editorItem_width
+    cellHeight: VLCStyle.editorItem_height
 
     boundsBehavior: Flickable.StopAtBounds
 
@@ -180,43 +181,60 @@ GridView {
             buttonDragItem.x = pos.x + VLCStyle.dragDelta
         }
 
-        Rectangle {
+        // VLC redesign (Figma: Customize Player): the control's icon in a
+        // dashed box with its name below
+        readonly property bool _highlighted: containsMouse && !buttonDragItem.Drag.active
+
+        ColumnLayout {
             anchors.fill: parent
+            anchors.topMargin: VLCStyle.margin_xsmall
+            spacing: VLCStyle.margin_xsmall
 
-            implicitWidth: childrenRect.width
-            implicitHeight: childrenRect.height
+            Item {
+                Layout.preferredWidth: VLCStyle.editorItem_boxSize
+                Layout.preferredHeight: VLCStyle.editorItem_boxSize
+                Layout.alignment: Qt.AlignHCenter
 
-            color: "transparent"
+                Canvas {
+                    anchors.fill: parent
 
-            border.width: VLCStyle.dp(1, VLCStyle.scale)
-            border.color: containsMouse && !buttonDragItem.Drag.active ? colorContext.border
-                                                                       : "transparent"
-            border.pixelAligned: (radius < Number.EPSILON)
+                    readonly property color strokeColor: _highlighted ? colorContext.fg.primary
+                                                                      : colorContext.fg.secondary
+                    onStrokeColorChanged: requestPaint()
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 10
+                    onPaint: {
+                        const ctx = getContext("2d")
+                        ctx.reset()
+                        ctx.strokeStyle = strokeColor
+                        ctx.lineWidth = 1
+                        ctx.setLineDash([2, 2])
+                        ctx.strokeRect(0.5, 0.5, width - 1, height - 1)
+                    }
+                }
 
                 EditorDummyButton {
-                    Layout.preferredWidth: VLCStyle.icon_medium
-                    Layout.preferredHeight: VLCStyle.icon_medium
-                    Layout.alignment: Qt.AlignHCenter
+                    anchors.centerIn: parent
+                    width: VLCStyle.icon_normal
+                    height: VLCStyle.icon_normal
 
-                    color: colorContext.fg.primary
+                    font.pixelSize: VLCStyle.icon_normal
+                    color: _highlighted ? colorContext.fg.primary : colorContext.fg.secondary
                     text: PlayerControlbarControls.controlList[model.index].label
                 }
+            }
 
-                Widgets.ListSubtitleLabel {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+            Widgets.ListSubtitleLabel {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                    color: colorContext.fg.secondary
-                    elide: Text.ElideNone
-                    fontSizeMode: Text.Fit
-                    text: PlayerControlbarControls.controlList[model.index].text
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                }
+                color: _highlighted ? colorContext.fg.primary : colorContext.fg.secondary
+                elide: Text.ElideNone
+                font.pixelSize: VLCStyle.fontSize_normal
+                font.weight: Font.Normal
+                text: PlayerControlbarControls.controlList[model.index].text
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignTop
             }
         }
     }

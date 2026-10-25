@@ -36,13 +36,18 @@ WindowDialog {
     minimumHeight: 400
 
     modal: true
-    title: qsTr("Toolbar Editor")
+    // VLC redesign (Figma: "Customize Player")
+    title: qsTr("Customize Player")
 
     signal unload()
 
     Component.onCompleted: {
         // Save first, in case the dialog is rejected.
         MainCtx.controlbarProfileModel.save(false)
+
+        const saveButton = buttonBox.standardButton(DialogButtonBox.Ok)
+        if (saveButton)
+            saveButton.text = qsTr("Save")
     }
 
     onAccepted: {

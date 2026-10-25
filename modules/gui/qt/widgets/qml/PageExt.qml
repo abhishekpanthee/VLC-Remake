@@ -182,7 +182,8 @@ T.Page {
 
                 Layout.fillWidth: true
 
-                color: theme.fg.primary
+                // Figma: library panel title, Dark/FG/A2
+                color: theme.fg.secondary
             }
 
             GridSortFilterControls {

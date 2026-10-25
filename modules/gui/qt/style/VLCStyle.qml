@@ -33,7 +33,7 @@ QtObject {
     readonly property FontMetrics fontMetrics_large    : FontMetrics { font.pixelSize: MainCtx.dp(15, scale); }
     readonly property FontMetrics fontMetrics_xlarge   : FontMetrics { font.pixelSize: MainCtx.dp(16, scale); }
     readonly property FontMetrics fontMetrics_xxlarge  : FontMetrics { font.pixelSize: MainCtx.dp(20, scale); }
-    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: MainCtx.dp(32, scale); }
+    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: MainCtx.dp(24, scale); }
 
     readonly property SystemPalette palette:  SystemPalette {
         objectName: "themePalette"
@@ -74,6 +74,8 @@ QtObject {
     readonly property int fontSize_xlarge: fontMetrics_xlarge.font.pixelSize
     readonly property int fontSize_xxlarge: fontMetrics_xxlarge.font.pixelSize
     readonly property int fontSize_xxxlarge: fontMetrics_xxxlarge.font.pixelSize
+    // VLC redesign: onboarding / display titles (Figma: Inter Light 32)
+    readonly property int fontSize_display: MainCtx.dp(32, scale)
 
     readonly property int fontHeight_xsmall: Math.ceil(fontMetrics_xsmall.lineSpacing)
     readonly property int fontHeight_small:  Math.ceil(fontMetrics_small.lineSpacing)
@@ -91,7 +93,8 @@ QtObject {
     readonly property int heightAlbumCover_xlarge: MainCtx.dp(512, scale);
 
     readonly property int listAlbumCover_height: MainCtx.dp(32, scale)
-    readonly property int listAlbumCover_width: listAlbumCover_height * 16.0/9
+    // VLC redesign (Figma: media rows): square 32px thumbnails
+    readonly property int listAlbumCover_width: listAlbumCover_height
     readonly property int listAlbumCover_radius: MainCtx.dp(3, scale)
     readonly property int trackListAlbumCover_width: MainCtx.dp(32, scale)
     readonly property int trackListAlbumCover_heigth: MainCtx.dp(32, scale)
@@ -210,6 +213,13 @@ QtObject {
     readonly property int navigationRail_padding: MainCtx.dp(8, scale)
     readonly property int navigationRail_spacing: MainCtx.dp(14, scale)
     readonly property int navigationRail_buttonSize: MainCtx.dp(30, scale)
+
+    // VLC redesign dialogs (Figma: Customize Player, Settings)
+    readonly property int dialog_padding: MainCtx.dp(12, scale)
+    readonly property int dialogButton_minimumWidth: MainCtx.dp(62, scale) * 1.6
+    readonly property int editorItem_width: MainCtx.dp(110, scale)
+    readonly property int editorItem_height: MainCtx.dp(76, scale)
+    readonly property int editorItem_boxSize: MainCtx.dp(28, scale)
 
     readonly property int volumeMeter_width: MainCtx.dp(88, scale)
     readonly property int volumeMeter_height: MainCtx.dp(28, scale)

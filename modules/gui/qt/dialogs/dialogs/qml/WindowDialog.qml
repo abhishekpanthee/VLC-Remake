@@ -38,10 +38,18 @@ Window {
     width: VLCStyle.appWidth * 0.75
     height: VLCStyle.appHeight * 0.85
 
-    color: theme.bg.primary
+    // VLC redesign (Figma: Customize Player / Settings dialogs)
+    color: dialogTheme.bg.primary
+
+    ColorContext {
+        id: dialogTheme
+        palette: VLCStyle.palette
+        colorSet: ColorContext.View
+    }
 
     property alias contentComponent: loader.sourceComponent
     property alias standardButtons: buttonBox.standardButtons
+    property alias buttonBox: buttonBox
     property alias colorContext: layout.colorContext
 
     signal accepted()
@@ -78,7 +86,7 @@ Window {
     ColumnLayout {
         id: layout
         anchors.fill: parent
-        anchors.margins: VLCStyle.margin_small
+        anchors.margins: VLCStyle.dialog_padding
 
 
         readonly property ColorContext colorContext: ColorContext {
@@ -106,6 +114,9 @@ Window {
 
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
+            // VLC redesign: compact buttons, not stretched to the dialog width
+            alignment: Qt.AlignRight | Qt.AlignVCenter
+
             background: null
 
             onAccepted: root.accepted()
@@ -115,8 +126,14 @@ Window {
             onReset: root.reset()
 
 
+            // VLC redesign: the accepting button uses the accent style (Figma: "Save"),
+            // the other ones the standard style (Figma: "Cancel")
             delegate: Widgets.ButtonExt {
-
+                colorContext.colorSet: (DialogButtonBox.buttonRole === DialogButtonBox.AcceptRole)
+                                       ? ColorContext.ButtonAccent : ColorContext.ButtonStandard
+                implicitWidth: Math.max(VLCStyle.dialogButton_minimumWidth,
+                                        implicitContentWidth + leftPadding + rightPadding)
+                implicitHeight: VLCStyle.control_height
             }
         }
     }

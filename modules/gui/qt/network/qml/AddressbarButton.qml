@@ -110,7 +110,8 @@ T.Button {
 
             color: button.foregroundColor
 
-            font.weight: (highlighted) ? Font.DemiBold : Font.Normal
+            // Figma: breadcrumb items are all regular weight
+            font.weight: Font.Normal
         }
     }
 }

@@ -32,6 +32,7 @@
 #include <QJSEngine>
 
 #include "mainctx.hpp"
+#include "style/widgettheme.hpp"
 #include "mainctx_submodels.hpp"
 #include "medialibrary/mlhelper.hpp"
 
@@ -484,7 +485,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(m_playerPlaylistWidth, "MainWindow/player-playlist-width", 120, this, &MainCtx::playerPlaylistWidthChanged);
     loadFromSettings(m_artistAlbumsWidth, "MainWindow/artist-albums-width", 120, this,  &MainCtx::artistAlbumsWidthChanged);
 
-    loadFromSettings(m_gridView, "MainWindow/grid-view", true, this, &MainCtx::gridViewChanged);
+    // VLC redesign: the library is shown as a list by default (Figma: sidebar)
+    loadFromSettings(m_gridView, "MainWindow/grid-view", false, this, &MainCtx::gridViewChanged);
 
     loadFromSettings(m_grouping, "MainWindow/grouping", GROUPING_NONE, this, &MainCtx::groupingChanged);
 
@@ -496,6 +498,39 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
 
     const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", 0 ).toInt();
     m_colorScheme->setCurrentIndex(colorSchemeIndex);
+
+    /* VLC redesign: theme the Qt Widgets part (menus, preferences and other
+     * classic dialogs) like the QML interface, unless the user picked a
+     * specific Qt style */
+    if (getSettings()->value( "MainWindow/QtStyle", "" ).toString().isEmpty())
+    {
+        const auto applyWidgetTheme = [this]() {
+            bool dark;
+            switch (m_colorScheme->currentScheme())
+            {
+            case ColorSchemeModel::ColorScheme::Day:
+                dark = false;
+                break;
+            case ColorSchemeModel::ColorScheme::Night:
+                dark = true;
+                break;
+            case ColorSchemeModel::ColorScheme::System:
+            default:
+                dark = WidgetTheme::systemIsDark();
+                break;
+            }
+
+            QColor accent;
+            char* accentOption = var_InheritString(p_intf, "qt-accent-color");
+            if (accentOption && strcmp(accentOption, "default") && strcmp(accentOption, "system"))
+                accent = QColor(accentOption);
+            free(accentOption);
+
+            WidgetTheme::apply(dark, accent);
+        };
+        applyWidgetTheme();
+        connect(m_colorScheme, &ColorSchemeModel::currentChanged, this, applyWidgetTheme);
+    }
 
     /* user interface scale factor */
     auto userIntfScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");

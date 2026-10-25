@@ -88,7 +88,8 @@ T.Pane {
 
             Layout.fillWidth: true
 
-            color: theme.fg.primary
+            // Figma: section header, Dark/FG/A1
+            color: theme.fg.secondary
         }
 
         TextToolButton {
