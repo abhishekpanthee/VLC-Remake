@@ -910,6 +910,10 @@ ifdef HAVE_ANDROID
 endif
 ifdef MSYS_BUILD
 	CMAKE_TOOLCHAIN_ENV += FIND_ROOT_PATH="$(shell cygpath -m $(PREFIX))"
+else ifeq ($(HAVE_MACOSX)$(HAVE_CROSS_COMPILE),11)
+# VLC Remake: macOS cross compilation (Intel on Apple Silicon): the system
+# frameworks (OpenGL...) are found in the SDK
+	CMAKE_TOOLCHAIN_ENV += FIND_ROOT_PATH="$(PREFIX);$(MACOSX_SDK)"
 else
 	CMAKE_TOOLCHAIN_ENV += FIND_ROOT_PATH="$(PREFIX)"
 endif
