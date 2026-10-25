@@ -618,6 +618,15 @@ FocusScope {
                                 cache: false
                                 asynchronous: true
 
+                                // drawn by `roundedCover` (see below): a zero scale keeps the
+                                // layout size and the texture for the blur while drawing nothing
+                                transform: Scale {
+                                    origin.x: cover.width / 2
+                                    origin.y: cover.height / 2
+                                    xScale: (roundedCover.status === Image.Ready) ? 0.0 : 1.0
+                                    yScale: xScale
+                                }
+
                                 onTargetSourceChanged: {
                                     cover.source = targetSource
                                 }
@@ -652,17 +661,39 @@ FocusScope {
                                                                                                                   }
                                                                                                               })
                                 }
+                            }
+
+                            // VLC redesign (Figma: Player - Music): the cover with rounded
+                            // corners. The plain `cover` image stays the texture provider of
+                            // the blurred background, and is not drawn itself.
+                            Widgets.ImageExt {
+                                id: roundedCover
+
+                                anchors.centerIn: cover
+                                width: cover.paintedWidth
+                                height: cover.paintedHeight
+
+                                source: cover.source
+                                sourceSize: cover.sourceSize
+                                fillMode: Image.PreserveAspectFit
+                                cache: false
+                                radius: VLCStyle.radius_large + VLCStyle.dp(2, VLCStyle.scale)
+                                backgroundColor: "transparent"
 
                                 Widgets.RoundedRectangleShadow {
+                                    z: -1
                                     color: Qt.rgba(0, 0, 0, .18)
                                     yOffset: VLCStyle.dp(24, VLCStyle.scale)
                                     blurRadius: VLCStyle.dp(54, VLCStyle.scale)
+                                    radius: roundedCover.radius
                                 }
 
                                 Widgets.RoundedRectangleShadow {
+                                    z: -1
                                     color: Qt.rgba(0, 0, 0, .22)
                                     yOffset: VLCStyle.dp(5, VLCStyle.scale)
                                     blurRadius: VLCStyle.dp(14, VLCStyle.scale)
+                                    radius: roundedCover.radius
                                 }
                             }
                         }
