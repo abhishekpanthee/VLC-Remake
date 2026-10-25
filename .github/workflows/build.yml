@@ -25,6 +25,8 @@ jobs:
     container:
       # VideoLAN's Windows cross-compilation image (see upstream extras/ci/gitlab-ci.yml)
       image: registry.videolan.org/vlc-debian-win64-posix:20260611225331
+      # the image runs as the "videolan" user, GitHub's actions need root
+      options: --user root
     steps:
       - uses: actions/checkout@v4
 
