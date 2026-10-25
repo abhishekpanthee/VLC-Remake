@@ -1,4 +1,4 @@
-# Builds the Windows and macOS packages with VLC's own packaging scripts
+# Builds the Windows package (macOS is built locally) with VLC's own packaging scripts
 # (the same recipes as VideoLAN's CI, extras/package/*/build.sh).
 #
 # - Run it from the Actions tab ("Run workflow"), or
@@ -59,57 +59,10 @@ jobs:
           name: vlc-remake-windows-x64
           path: dist/*
 
-  macos:
-    name: macOS ${{ matrix.arch }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: aarch64
-            runner: macos-14
-            group: macos-arm64
-          - arch: x86_64
-            runner: macos-13
-            group: macos-x86_64
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 360
-    env:
-      VLC_FORCE_KERNELVERSION: 19
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Use prebuilt contribs if available
-        run: |
-          url="https://artifacts.videolan.org/vlc/${{ matrix.group }}/vlc-contrib-${{ matrix.arch }}-apple-darwin${VLC_FORCE_KERNELVERSION}-${UPSTREAM_CONTRIB_SHA}.tar.zst"
-          if extras/ci/check-url.sh "$url"; then
-            echo "VLC_PREBUILT_CONTRIBS_URL=$url" >> "$GITHUB_ENV"
-          else
-            echo "Prebuilt contribs not found, they will be built from source (slow)"
-          fi
-
-      - name: Build and package
-        run: |
-          mkdir -p build && cd build
-          # -i n: disk image (unsigned)
-          ../extras/package/macosx/build.sh -i n -a ${{ matrix.arch }} -j "$(sysctl -n hw.ncpu)"
-
-      - name: Collect packages
-        run: |
-          mkdir -p dist
-          find build -maxdepth 2 -type f \( -name 'vlc-*.dmg' -o -name 'vlc-*.tar.gz' \) -exec cp {} dist/ \;
-          for f in dist/*; do mv "$f" "${f%.*}-${{ matrix.arch }}.${f##*.}"; done
-          ls -la dist
-          test -n "$(ls dist)"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: vlc-remake-macos-${{ matrix.arch }}
-          path: dist/*
-
   release:
     name: Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [windows, macos]
+    needs: [windows]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
