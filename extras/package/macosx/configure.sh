@@ -6,6 +6,8 @@ SCRIPTDIR=$(dirname "$0")
 OPTIONS="
         --prefix=/
         --enable-macosx
+        --enable-qt
+        --disable-sparkle
         --enable-merge-ffmpeg
         --enable-osx-notifications
         --enable-flac

@@ -96,7 +96,13 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
 
     ui.MainBlabla->setText("<html><head/><body>" +
     qtr( "<p>VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the <a href=\"https://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join us!</span></a>" ) +
-    "</p></body> </html>");
+    "</p>" +
+    /* VLC Remake: credit for the redesigned interface */
+    qtr( "<p>Interface redesigned by <b>Abhishek Panthee</b> "
+         "(<a href=\"https://abhishekpanthee.com.np\"><span style=\" text-decoration: underline; color:#d37918;\">abhishekpanthee.com.np</span></a>)<br>"
+         "<a href=\"https://github.com/abhishekpanthee\"><span style=\" text-decoration: underline; color:#d37918;\">https://github.com/abhishekpanthee</span></a><br>"
+         "This is an unofficial build, not made or endorsed by VideoLAN.</p>" ) +
+    "</body> </html>");
 
     const QDate today = QDate::currentDate();
     if( today.month() == 4 && today.day() == 1

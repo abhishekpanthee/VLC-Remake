@@ -234,6 +234,8 @@ public slots:
     void gotoTimeDialog();
     void podcastConfigureDialog();
     void pluginDialog();
+    /// VLC Remake: explains how to get new versions (no automatic updates)
+    void remakeUpdatesDialog();
     void epgDialog();
     void setPopupMenu();
     void destroyPopupMenu();

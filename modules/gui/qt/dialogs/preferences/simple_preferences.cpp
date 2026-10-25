@@ -1140,6 +1140,23 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             buildOptionsPanel( panel, {
                 { qtr( "Startup" ), { "qt-continue", "auto-preparse" }, {} },
                 { qtr( "Window" ), { "qt-name-in-title" }, {} } } );
+            {
+                /* VLC Remake: no automatic updates */
+                QGroupBox *updates = new QGroupBox( qtr( "Updates" ), panel );
+                QVBoxLayout *updatesLayout = new QVBoxLayout( updates );
+                QLabel *updatesText = new QLabel( qtr(
+                    "VLC Remake does not check for updates: VLC's own updater would replace "
+                    "this redesigned version with the official VLC media player. New versions "
+                    "are published on the GitHub releases page." ), updates );
+                updatesText->setWordWrap( true );
+                updatesLayout->addWidget( updatesText );
+                QPushButton *updatesButton = new QPushButton( qtr( "About Updates..." ), updates );
+                connect( updatesButton, &QPushButton::clicked,
+                         DialogsProvider::getInstance(), &DialogsProvider::remakeUpdatesDialog );
+                updatesLayout->addWidget( updatesButton, 0, Qt::AlignLeft );
+                if ( auto box = qobject_cast<QBoxLayout*>( panel->layout() ) )
+                    box->insertWidget( box->count() - 1, updates );
+            }
             break;
 
         case SPrefsPrivacy:

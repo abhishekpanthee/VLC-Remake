@@ -545,8 +545,10 @@ if [ -n "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-qt --disable-skins2"
     MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=disabled -Dskins2=disabled"
 else
-    CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2 --enable-update-check"
-    MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=enabled -Dskins2=enabled -Dupdate-check=enabled"
+    # VLC Remake: no update check (VideoLAN's updates would replace the redesign),
+    # new versions are published on the GitHub releases page
+    CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=enabled -Dskins2=enabled"
 fi
 if [ -n "$WINSTORE" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-winstore-app"

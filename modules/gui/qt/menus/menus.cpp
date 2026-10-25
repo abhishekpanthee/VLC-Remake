@@ -564,6 +564,11 @@ void VLCMenuBar::HelpMenu(qt_intf_t *p_intf, QMenu *menu )
             updateModel->checkUpdate(true);
         }
     });
+#else
+    /* VLC Remake: explain where the new versions are */
+    VLC_UNUSED( p_intf );
+    addDPStaticEntry( menu, qtr( "Check for &Updates..." ), "",
+                      &DialogsProvider::remakeUpdatesDialog );
 #endif
     menu->addSeparator();
     addDPStaticEntry( menu, qfut( I_MENU_ABOUT ), ":/menu/info.svg",

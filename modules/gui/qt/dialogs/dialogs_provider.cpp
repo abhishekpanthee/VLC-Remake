@@ -69,6 +69,8 @@
 #include <QInputDialog>
 #include <QPointer>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QDesktopServices>
 
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
@@ -542,6 +544,28 @@ void DialogsProvider::podcastConfigureDialog()
 void DialogsProvider::pluginDialog()
 {
     toggleDialogVisible(m_pluginDialog);
+}
+
+/* VLC Remake: no automatic updates, the new versions are published on GitHub */
+void DialogsProvider::remakeUpdatesDialog()
+{
+    static const char releasesUrl[] = "https://github.com/abhishekpanthee/VLC-Remake/releases";
+    QMessageBox box( QMessageBox::Information, qtr( "Updates" ),
+        qtr( "VLC Remake does not update itself." ),
+        QMessageBox::NoButton );
+    box.setInformativeText( qtr(
+        "Automatic updates are turned off: VLC's own updater would replace this "
+        "redesigned version with the official VLC media player.<br><br>"
+        "New versions of VLC Remake are published on the GitHub releases page. "
+        "To be notified, open the repository and choose "
+        "<b>Watch \u2192 Custom \u2192 Releases</b>." ) );
+    box.setTextFormat( Qt::RichText );
+    QPushButton *open = box.addButton( qtr( "Open Releases Page" ), QMessageBox::AcceptRole );
+    box.addButton( QMessageBox::Close );
+    box.setDefaultButton( open );
+    box.exec();
+    if( box.clickedButton() == open )
+        QDesktopServices::openUrl( QUrl( QString::fromLatin1( releasesUrl ) ) );
 }
 
 void DialogsProvider::epgDialog()
