@@ -217,10 +217,10 @@ T.Control {
                 return VLCIcons.play_filled
         }
 
-        color: cursorInside ? theme.accent
-                            : "black"  //foreground is always black
+        // VLC redesign: dark glyph on the accent pill (Figma: FG/B1)
+        color: "#161616"
 
-        font.pixelSize: Math.round(parent.height / 1.7)
+        font.pixelSize: VLCStyle.icon_normal
 
         font.family: VLCIcons.fontFamily
 
@@ -239,15 +239,16 @@ T.Control {
         }
     }
 
+    // VLC redesign (Figma: Controls/play): 54x28 accent pill, 6px radius
     background: Item {
-        implicitWidth: height
-        implicitHeight: VLCStyle.icon_medium
+        implicitWidth: VLCStyle.playPill_width
+        implicitHeight: VLCStyle.playPill_height
 
         Widgets.AnimatedBackground {
             anchors.fill: parent
-            anchors.margins: -border.width * 4
+            anchors.margins: -border.width * 2
 
-            radius: width / 2
+            radius: VLCStyle.radius_normal + border.width * 2
             border.pixelAligned: false
 
             enabled: theme.initialized
@@ -258,12 +259,10 @@ T.Control {
         Rectangle {
             anchors.fill: parent
 
-            radius: width / 2
+            radius: VLCStyle.radius_normal
 
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#e25b01" }
-                GradientStop { position: 1.0; color: "#f89a06" }
-            }
+            // revealed while the button is held (press and hold stops playback)
+            color: Qt.darker(theme.accent, 2.5)
 
             Widgets.RoundedRectangleShadow {
                 id: hoverShadow
@@ -280,13 +279,12 @@ T.Control {
             Rectangle {
                 id: innerRectangle
 
-                color: "white"
+                color: root.cursorInside ? Qt.lighter(theme.accent, 1.15) : theme.accent
 
                 anchors.fill: parent
-                anchors.margins: _diminished ? (parent.width / 2)
-                                             : VLCStyle.dp(2, VLCStyle.scale)
+                anchors.margins: _diminished ? (parent.height / 2) : 0
 
-                radius: width / 2
+                radius: VLCStyle.radius_normal
 
                 property bool _diminished: false
 

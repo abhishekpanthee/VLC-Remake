@@ -97,8 +97,8 @@ T.Pane {
         Widgets.SliderExt {
             id: volControl
 
-            // FIXME: use VLCStyle
-            implicitWidth: VLCStyle.dp(100, VLCStyle.scale)
+            implicitWidth: VLCStyle.volumeMeter_width
+            implicitHeight: VLCStyle.volumeMeter_height
 
             // WARNING: Directly setting the insets break handle and background positioning.
             Binding on topInset {
@@ -110,8 +110,8 @@ T.Pane {
                 value: VLCStyle.touchHandlerMargin
             }
 
-            Layout.fillHeight: true
-            Layout.margins: VLCStyle.margin_xsmall
+            Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: VLCStyle.margin_xsmall
 
             property bool _inhibitPlayerVolumeUpdate: false
 
@@ -126,6 +126,80 @@ T.Pane {
             property bool filterEvents: false
 
             color: root.sliderColor
+
+            // VLC redesign (Figma: "volume"): a wedge shaped meter whose gradient
+            // fill (green -> orange -> red over the whole range) is clipped to the
+            // current level. Paths are the Figma vectors in a 89x28 box.
+            handle: Item {
+                implicitWidth: 0
+                implicitHeight: 0
+            }
+
+            background: Canvas {
+                id: volumeMeter
+
+                readonly property string _trackPath: "M3.59756 19.3638C1.55468 19.1572 0 17.4374 0 15.3841V12.6159C0 10.5626 1.55467 8.84279 3.59756 8.6362L85.6982 0.333893C87.4654 0.155189 89 1.54247 89 3.31867V24.6813C89 26.4575 87.4654 27.8448 85.6982 27.6661L3.59756 19.3638Z"
+                readonly property string _fillPath: "M3.29183 17.6875C2.27342 17.5809 1.5 16.7223 1.5 15.6984V12.3016C1.5 11.2776 2.27342 10.419 3.29183 10.3125L85.2918 1.73109C86.4723 1.60755 87.5 2.53331 87.5 3.72022V24.2798C87.5 25.4667 86.4723 26.3924 85.2918 26.2689L3.29183 17.6875Z"
+
+                readonly property real level: volControl.visualPosition
+                readonly property color trackColor: volControl.colorContext.bg.primary
+                readonly property color lowColor: volControl.colorContext.fg.positive
+                readonly property color midColor: volControl.colorContext.fg.neutral
+                readonly property color highColor: volControl.colorContext.fg.negative
+
+                x: volControl.leftPadding
+                y: volControl.topPadding + (volControl.availableHeight - height) / 2
+                implicitWidth: VLCStyle.volumeMeter_width
+                implicitHeight: VLCStyle.volumeMeter_height
+                width: volControl.availableWidth
+                height: implicitHeight
+
+                onLevelChanged: requestPaint()
+                onTrackColorChanged: requestPaint()
+                onLowColorChanged: requestPaint()
+                onMidColorChanged: requestPaint()
+                onHighColorChanged: requestPaint()
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+
+                function _mix(a, b, t) {
+                    return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t,
+                                   a.b + (b.b - a.b) * t, 1.0)
+                }
+
+                onPaint: {
+                    const ctx = getContext("2d")
+                    ctx.reset()
+                    if (width <= 0 || height <= 0)
+                        return
+                    ctx.scale(width / 89, height / 28)
+
+                    ctx.fillStyle = trackColor
+                    ctx.path = _trackPath
+                    ctx.fill()
+
+                    if (level <= 0)
+                        return
+
+                    ctx.save()
+                    ctx.beginPath()
+                    ctx.rect(0, -1, 88 * level, 30)
+                    ctx.clip()
+
+                    const gradient = ctx.createLinearGradient(-1, 14, 89, 14)
+                    gradient.addColorStop(0.0, lowColor)
+                    gradient.addColorStop(0.578809, _mix(lowColor, midColor, 0.47))
+                    gradient.addColorStop(0.792379, midColor)
+                    gradient.addColorStop(1.0, highColor)
+                    ctx.fillStyle = gradient
+                    ctx.path = _fillPath
+                    ctx.fill()
+
+                    ctx.fillStyle = Qt.rgba(0, 0, 0, 0.2)
+                    ctx.fill()
+                    ctx.restore()
+                }
+            }
 
             from: 0
             to: root._maxvolpos
@@ -246,7 +320,8 @@ T.Pane {
                 radius: VLCStyle.dp(2, VLCStyle.scale)
 
                 // NOTE: This shouldn't be visible when the volume stops before a 100.
-                visible: (root._maxvol > 100)
+                // VLC redesign: the meter gradient conveys the level, no tick mark
+                visible: false
 
                 // FIXME: tick mark is not visible when it's over slider
                 color: root.sliderColor

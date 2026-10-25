@@ -1292,13 +1292,13 @@ FocusScope {
 
         focus: true
 
-        rightPadding: VLCStyle.applicationHorizontalMargin
-        leftPadding: VLCStyle.applicationHorizontalMargin
-        bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
+        // VLC redesign: single 54px row with the seek bar inlined
+        textPosition: ControlBar.TimeTextPosition.Inline
 
-        textPosition: (MainCtx.pinVideoControls)
-                      ? ControlBar.TimeTextPosition.LeftRightSlider
-                      : ControlBar.TimeTextPosition.AboveSlider
+        rightPadding: VLCStyle.applicationHorizontalMargin + (_inline ? VLCStyle.controlBar_horizontalPadding : 0)
+        leftPadding: VLCStyle.applicationHorizontalMargin + (_inline ? VLCStyle.controlBar_horizontalPadding : 0)
+        topPadding: _inline ? VLCStyle.controlBar_verticalPadding : 0
+        bottomPadding: VLCStyle.applicationVerticalMargin + (_inline ? VLCStyle.controlBar_verticalPadding : VLCStyle.margin_xsmall)
 
         // hide right text so that it won't overlap with play queue
         showRemainingTime: (textPosition !== ControlBar.TimeTextPosition.AboveSlider)
@@ -1336,9 +1336,12 @@ FocusScope {
         background: Rectangle {
             id: controlBarBackground
 
-            visible: !MainCtx.hasEmbededVideo || MainCtx.pinVideoControls || !rootPlayer.displayFadeRectangles
+            visible: controlBar._inline || !MainCtx.hasEmbededVideo || MainCtx.pinVideoControls || !rootPlayer.displayFadeRectangles
 
             opacity: {
+                // VLC redesign: BG/A3 Transparent (95%) over video, opaque otherwise
+                if (controlBar._inline)
+                    return MainCtx.hasEmbededVideo ? 0.95 : 1.0
                 if (MainCtx.hasEmbededVideo && !MainCtx.pinVideoControls && !rootPlayer.displayFadeRectangles) {
                     return 0.6
                 } else if ((Window.visibility === Window.FullScreen) && MainCtx.hasEmbededVideo) {
@@ -1350,7 +1353,15 @@ FocusScope {
                 }
             }
 
-            color: windowTheme.bg.primary
+            color: controlBar._inline ? windowTheme.bg.secondary : windowTheme.bg.primary
+
+            // top divider (Figma: Dark/Divider/Dim)
+            Rectangle {
+                visible: controlBar._inline
+                anchors { left: parent.left; right: parent.right; top: parent.top }
+                height: VLCStyle.border
+                color: windowTheme.border
+            }
         }
 
         FadeControllerStateGroup {

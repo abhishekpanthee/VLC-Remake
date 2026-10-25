@@ -36,6 +36,13 @@ FocusScope {
 
     property int identifier: -1
 
+    // VLC redesign: optional item (ie. the seek bar with its time labels) laid
+    // out between the left and right control groups, filling the free space.
+    // Only used when the center group is empty (combined left/right layout).
+    property Item centerItem: null
+
+    readonly property bool centerItemShown: !!centerItem && loaderLeftRight.active
+
     readonly property PlayerControlbarModel model: {
         if (!!MainCtx.controlbarProfileModel.currentModel)
             return MainCtx.controlbarProfileModel.currentModel.getModel(identifier)
@@ -118,6 +125,19 @@ FocusScope {
             }
 
             Item {
+                id: centerFiller
+
+                Layout.fillHeight: !!playerControlLayout.centerItem
+
+                // host the center item; the item anchors itself to its parent and is
+                // expected to keep a gap of (layoutSpacing - spacing) to the groups
+                Binding {
+                    target: playerControlLayout.centerItem
+                    when: !!playerControlLayout.centerItem
+                    property: "parent"
+                    value: centerFiller
+                }
+
                 function containsVisibleItem(repeater) {
                     for (let i = 0; i < repeater.count; ++i) {
                         const item = repeater.itemAt(i)
@@ -129,8 +149,12 @@ FocusScope {
                     return false
                 }
 
-                Layout.minimumWidth: (containsVisibleItem(leftRepeater) && containsVisibleItem(rightRepeater)) ? playerControlLayout.layoutSpacing
-                                                                                                               : 0
+                Layout.minimumWidth: {
+                    if (playerControlLayout.centerItem)
+                        return playerControlLayout.centerItem.implicitWidth + 2 * playerControlLayout.layoutSpacing
+                    return (containsVisibleItem(leftRepeater) && containsVisibleItem(rightRepeater)) ? playerControlLayout.layoutSpacing
+                                                                                                    : 0
+                }
 
                 Layout.fillWidth: true
                 visible: true
