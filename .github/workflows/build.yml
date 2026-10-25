@@ -188,6 +188,39 @@ jobs:
           } > "$APP/README-LINUX.txt"
           mkdir -p dist
           tar -czf dist/vlc-remake-linux-x86_64.tar.gz "$APP"
+
+          # .deb: installs to /opt/vlc-remake (next to any VLC from the distribution),
+          # with a vlc-remake command and an applications menu entry
+          DEB=deb-root
+          rm -rf "$DEB"
+          mkdir -p "$DEB/DEBIAN" "$DEB/opt" "$DEB/usr/bin" "$DEB/usr/share/applications"
+          cp -a "$APP" "$DEB/opt/vlc-remake"
+          cp share/icons/256x256/vlc.png "$DEB/opt/vlc-remake/vlc-remake.png"
+          ln -s /opt/vlc-remake/vlc-remake "$DEB/usr/bin/vlc-remake"
+          printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=VLC Remake' \
+            'GenericName=Media player' 'Comment=VLC media player with the redesigned interface' \
+            'Exec=/opt/vlc-remake/vlc-remake %U' 'Icon=/opt/vlc-remake/vlc-remake.png' 'Terminal=false' \
+            'Categories=AudioVideo;Player;Video;Audio;' \
+            'MimeType=video/mp4;video/x-matroska;video/webm;video/x-msvideo;video/quicktime;video/mpeg;audio/mpeg;audio/flac;audio/ogg;audio/x-wav;audio/mp4;' \
+            > "$DEB/usr/share/applications/vlc-remake.desktop"
+          VERSION="4.0.0~dev+remake${{ github.run_number }}"
+          DEPENDS="$(sort -u pkgs.txt | grep -v '^$' | paste -sd, - | sed 's/,/, /g')"
+          {
+            echo "Package: vlc-remake"
+            echo "Version: $VERSION"
+            echo "Architecture: amd64"
+            echo "Maintainer: VLC Remake <noreply@github.com>"
+            echo "Depends: $DEPENDS"
+            echo "Section: video"
+            echo "Priority: optional"
+            echo "Homepage: https://github.com/${{ github.repository }}"
+            echo "Description: VLC media player with a redesigned interface (unofficial)"
+            echo " Unofficial build of VLC media player (VideoLAN and the VLC authors,"
+            echo " GNU GPL v2 or later) with the community VLC Redesign interface."
+            echo " Installs to /opt/vlc-remake, run it with vlc-remake."
+          } > "$DEB/DEBIAN/control"
+          cat "$DEB/DEBIAN/control"
+          dpkg-deb --root-owner-group --build "$DEB" "dist/vlc-remake_${VERSION}_amd64.deb"
           ls -la dist
 
       - uses: actions/upload-artifact@v4
@@ -304,6 +337,6 @@ jobs:
 
             - **Windows**: `vlc-4.0.0-dev-win64.exe` (installer) or the `.zip` (portable).
             - **macOS** (Apple Silicon, macOS 12+): the `.dmg`, if present. Right click > Open the first time.
-            - **Linux** (Ubuntu 24.04): `vlc-remake-linux-x86_64.tar.gz`, see README-LINUX.txt inside.
+            - **Linux** (Ubuntu 24.04): the `.deb` (`sudo apt install ./vlc-remake_*.deb`), or `vlc-remake-linux-x86_64.tar.gz` (see README-LINUX.txt inside).
 
             The packages are not code signed (see the README).
