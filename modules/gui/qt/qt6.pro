@@ -21,6 +21,8 @@ QTPLUGIN += qcocoa qmacstyle
 # suffix), the contribs build Qt in release
 CONFIG -= debug
 CONFIG += release
+# the AGL framework (in Qt's mac.conf) is gone from recent macOS SDKs
+QMAKE_LIBS_OPENGL = -framework OpenGL
 }
 
 ios {
