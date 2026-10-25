@@ -97,7 +97,7 @@ To be notified, click **Watch** > **Custom** > **Releases** at the top of this p
 | | |
 |---|---|
 | ![macOS](docs/screenshots/macos-1.png) | ![macOS](docs/screenshots/macos-2.png) |
-| ![macOS](docs/screenshots/macos-3.png) | ![macOS](docs/screenshots/macos-4.png) |
+| ![macOS](docs/screenshots/macos-3.png) |  |
 
 ## What is redesigned
 
