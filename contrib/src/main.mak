@@ -656,7 +656,8 @@ endif
 endif
 endif
 
-ifdef HAVE_CROSS_COMPILE
+# VLC Remake: on macOS the contrib CMake toolchain makes Qt cross compile
+ifneq ($(HAVE_CROSS_COMPILE)$(HAVE_MACOSX),)
 ifdef QT_USES_SYSTEM_TOOLS
  # using system Qt native tools
  QT_HOST_PREFIX := $(shell PATH="${SYSTEM_PATH}" qmake6 -query QT_HOST_PREFIX)

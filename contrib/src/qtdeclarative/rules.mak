@@ -22,7 +22,7 @@ PKGS_ALL += qtdeclarative-tools
 ifeq ($(call need_pkg,"Qt6Qml >= $(QTBASE_VERSION_MAJOR) Qt6Quick >= $(QTBASE_VERSION_MAJOR) Qt6QuickControls2 >= $(QTBASE_VERSION_MAJOR) Qt6QuickLayouts >= $(QTBASE_VERSION_MAJOR) Qt6QmlWorkerScript >= $(QTBASE_VERSION_MAJOR)"),)
 PKGS_FOUND += qtdeclarative
 endif
-ifndef HAVE_CROSS_COMPILE
+ifeq ($(HAVE_CROSS_COMPILE)$(HAVE_MACOSX),)
 PKGS_FOUND += qtdeclarative-tools
 else ifdef QT_USES_SYSTEM_TOOLS
 PKGS_FOUND += qtdeclarative-tools

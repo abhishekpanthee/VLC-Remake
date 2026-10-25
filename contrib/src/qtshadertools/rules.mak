@@ -27,7 +27,7 @@ $(TARBALLS)/qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz:
 .sum-qtshadertools-tools: .sum-qtshadertools
 	touch $@
 
-ifdef HAVE_CROSS_COMPILE
+ifneq ($(HAVE_CROSS_COMPILE)$(HAVE_MACOSX),)
 QT_SHADETOOLS_NATIVE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(QT_HOST_LIBS)/cmake/Qt6/qt.toolchain.cmake
 else
 QT_SHADETOOLS_NATIVE_CONFIG := $(QT_CMAKE_CONFIG)

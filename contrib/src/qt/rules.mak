@@ -26,7 +26,7 @@ endif
 ifeq ($(call need_pkg,"Qt6Core >= $(QTBASE_VERSION_MAJOR) Qt6Gui >= $(QTBASE_VERSION_MAJOR) Qt6Widgets >= $(QTBASE_VERSION_MAJOR)"),)
 PKGS_FOUND += qt
 endif
-ifndef HAVE_CROSS_COMPILE
+ifeq ($(HAVE_CROSS_COMPILE)$(HAVE_MACOSX),)
 PKGS_FOUND += qt-tools
 else ifdef QT_USES_SYSTEM_TOOLS
 PKGS_FOUND += qt-tools
