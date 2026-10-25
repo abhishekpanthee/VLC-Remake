@@ -149,17 +149,18 @@ decltype (ControlbarProfileModel::m_defaults)
                         PlayerControlbarModel::Miniplayer,
                         {
                             {
+                                // VLC redesign: one row like the player
+                                // control bar, the seek bar in the center
                                 {
                                     ControlListModel::ARTWORK_INFO
                                 },
                                 {
-                                    ControlListModel::RANDOM_BUTTON,
+
+                                },
+                                {
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::NEXT_BUTTON,
-                                    ControlListModel::LOOP_BUTTON
-                                },
-                                {
                                     ControlListModel::VOLUME,
                                     ControlListModel::PLAYER_SWITCH_BUTTON
                                 }

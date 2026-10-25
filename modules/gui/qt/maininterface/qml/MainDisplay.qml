@@ -1058,8 +1058,8 @@ FocusScope {
 
         z: 3
 
-        horizontalPadding: VLCStyle.applicationHorizontalMargin
-        bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
+        horizontalPadding: VLCStyle.applicationHorizontalMargin + (_inline ? VLCStyle.controlBar_horizontalPadding : 0)
+        bottomPadding: VLCStyle.applicationVerticalMargin + (_inline ? VLCStyle.controlBar_verticalPadding : VLCStyle.margin_xsmall)
 
         background.visible: !stackViewParent.layer.enabled
 

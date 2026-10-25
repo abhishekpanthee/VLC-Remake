@@ -34,6 +34,7 @@
 #include "qt.hpp"
 #include "maininterface/mainctx.hpp"
 #include "open_panels.hpp"
+#include "style/widgettheme.hpp"
 #include "dialogs/open/open.hpp"
 #include "dialogs/dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
@@ -706,6 +707,18 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     QFont smallFont = QApplication::font();
     smallFont.setPointSize( smallFont.pointSize() - 1 );
     ui.examples->setFont( smallFont );
+
+    /* VLC redesign (Figma: Open network stream) */
+    ui.groupBox->setTitle( qtr( "Network URL" ) );
+    ui.label_1->setText( qtr( "Enter the address of the stream to open." ) );
+    ui.label_1->setStyleSheet( QStringLiteral( "color: %1;" ).arg( WidgetTheme::textTertiary().name() ) );
+    ui.examples->setStyleSheet( QStringLiteral( "color: %1;" ).arg( WidgetTheme::textTertiary().name() ) );
+    ui.urlComboBox->setMinimumHeight( 37 );
+    ui.clearHistoryButton->setMaximumWidth( QWIDGETSIZE_MAX );
+    ui.clearHistoryButton->setMinimumHeight( 37 );
+    ui.urlComboBox->setMaximumWidth( QWIDGETSIZE_MAX );
+    if( ui.urlComboBox->lineEdit() )
+        ui.urlComboBox->lineEdit()->setPlaceholderText( qtr( "e.g., https://www.example.com/stream.avi" ) );
 
     /* Use a simple validator for URLs */
     ui.urlComboBox->setValidator( new UrlValidator( this ) );

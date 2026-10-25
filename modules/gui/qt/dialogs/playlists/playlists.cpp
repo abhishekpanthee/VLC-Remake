@@ -25,6 +25,7 @@
 #endif
 
 #include "playlists.hpp"
+#include "style/widgettheme.hpp"
 
 // VLC includes
 #include <vlc_media_library.h>
@@ -86,14 +87,27 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, const QVariantList &media,
 
     labelNew->setText(qtr("New Playlist"));
 
+    // VLC redesign (Figma: new playlist): 16px label, hint and placeholder
+    QFont labelFont = labelNew->font();
+    labelFont.setPixelSize(16);
+    labelNew->setFont(labelFont);
+
+    QLabel * hintNew = new QLabel(qtr("The playlist will be saved and displayed with this title."), this);
+    hintNew->setStyleSheet(QStringLiteral("color: %1;").arg(WidgetTheme::textTertiary().name()));
+
     // FIXME: Add and configure a QValidator.
     m_lineEdit = new QLineEdit(this);
+    m_lineEdit->setPlaceholderText(qtr("e.g., Favorite Videos"));
+    m_lineEdit->setMinimumHeight(37);
 
     connect(m_lineEdit, &QLineEdit::textEdited, this, &PlaylistsDialog::onTextEdited);
 
-    QHBoxLayout * layoutNew = new QHBoxLayout;
+    QVBoxLayout * layoutNew = new QVBoxLayout;
+    layoutNew->setSpacing(5);
 
     layoutNew->addWidget(labelNew);
+    layoutNew->addWidget(hintNew);
+    layoutNew->addSpacing(10);
     layoutNew->addWidget(m_lineEdit);
 
     //---------------------------------------------------------------------------------------------
@@ -104,6 +118,8 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, const QVariantList &media,
                                                         Qt::Horizontal, this);
 
     m_button = buttonBox->button(QDialogButtonBox::Ok);
+    m_button->setText(qtr("Save"));
+    m_button->setDefault(true);
 
     m_button->setEnabled(false);
 
