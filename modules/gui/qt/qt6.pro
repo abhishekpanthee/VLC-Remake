@@ -17,6 +17,10 @@ QTPLUGIN += qxcb-glx-integration qxcb-egl-integration qxcb qwayland-generic qway
 
 macx {
 QTPLUGIN += qcocoa qmacstyle
+# VLC Remake: qmake defaults to debug on macOS (libraries with a _debug
+# suffix), the contribs build Qt in release
+CONFIG -= debug
+CONFIG += release
 }
 
 ios {

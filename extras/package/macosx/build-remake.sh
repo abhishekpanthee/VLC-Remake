@@ -48,7 +48,7 @@ cd "$BUILD"
     || echo "== build.sh stopped, finishing the compilation"
 
 test -f Makefile || { echo "VLC was not configured, see the errors above"; exit 1; }
-grep -q "^enable_qt='yes'" config.log || { echo "Qt was not found: the redesigned interface would be missing"; exit 1; }
+grep -q "^ENABLE_QT_TRUE=''" config.log || { echo "Qt was not found: the redesigned interface would be missing"; exit 1; }
 
 # configure loses the SDK of the Objective-C compilers with recent Xcode
 SDK="$(xcrun --sdk macosx --show-sdk-path)"
