@@ -309,7 +309,7 @@ jobs:
             | System | File |
             |---|---|
             | Windows 10/11 (64-bit) | `vlc-remake-windows-x64-setup.exe` |
-            | macOS 12+ Apple Silicon (M1–M4) | `vlc-remake-macos-arm64.dmg` |
+            | macOS 12+ Apple Silicon (M1 and later) | `vlc-remake-macos-arm64.dmg` |
             | macOS 12+ Intel | `vlc-remake-macos-x86_64.dmg` (when available) |
             | Ubuntu 24.04, Mint 22, Pop!_OS 24.04 | `vlc-remake-linux-amd64.deb` |
             | Other Linux distributions | `vlc-remake-linux-x86_64.AppImage` |

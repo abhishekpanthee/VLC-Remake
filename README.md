@@ -20,7 +20,7 @@ Download the file for your system from the **[latest release](https://github.com
 | Your system | Download | |
 |---|---|---|
 | **Windows** 10 / 11 (64-bit) | [`vlc-remake-windows-x64-setup.exe`](https://github.com/abhishekpanthee/VLC-Remake/releases/latest/download/vlc-remake-windows-x64-setup.exe) | installer |
-| **macOS** 12 or later, Apple Silicon (M1, M2, M3, M4) | [`vlc-remake-macos-arm64.dmg`](https://github.com/abhishekpanthee/VLC-Remake/releases/latest/download/vlc-remake-macos-arm64.dmg) | disk image |
+| **macOS** 12 or later, Apple Silicon (M1, M2, M3, M4, M5 and later) | [`vlc-remake-macos-arm64.dmg`](https://github.com/abhishekpanthee/VLC-Remake/releases/latest/download/vlc-remake-macos-arm64.dmg) | disk image |
 | **macOS** 12 or later, Intel | [`vlc-remake-macos-x86_64.dmg`](https://github.com/abhishekpanthee/VLC-Remake/releases/latest/download/vlc-remake-macos-x86_64.dmg) | disk image, when available |
 | **Ubuntu** 24.04, Linux Mint 22, Pop!_OS 24.04 | [`vlc-remake-linux-amd64.deb`](https://github.com/abhishekpanthee/VLC-Remake/releases/latest/download/vlc-remake-linux-amd64.deb) | package |
 | **Other Linux** distributions (64-bit) | [`vlc-remake-linux-x86_64.AppImage`](https://github.com/abhishekpanthee/VLC-Remake/releases/latest/download/vlc-remake-linux-x86_64.AppImage) | single file, no install |
