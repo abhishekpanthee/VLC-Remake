@@ -679,10 +679,12 @@ FocusScope {
                                 value: centerContent.height > (albumLabel.y + albumLabel.height)
                             }
 
-                            text: Player.album
-                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            // VLC redesign (Figma: Player - Music): "title - artist", 16px Dark/FG/A1
+                            text: (Player.artist && Player.artist.length > 0) ? (Player.title + " - " + Player.artist)
+                                                                             : Player.title
+                            font.pixelSize: VLCStyle.fontSize_xlarge
                             horizontalAlignment: Text.AlignHCenter
-                            color: centerTheme.fg.primary
+                            color: centerTheme.fg.secondary
                             Accessible.description: qsTr("album")
 
                             property bool componentCompleted: false
@@ -704,10 +706,11 @@ FocusScope {
                                 value: centerContent.height > (artistLabel.y + artistLabel.height)
                             }
 
-                            text: Player.artist
+                            // the album, as a second line (the artist is on the first one)
+                            text: Player.album
                             font.weight: Font.Light
                             horizontalAlignment: Text.AlignHCenter
-                            color: centerTheme.fg.primary
+                            color: centerTheme.fg.secondary
                             Accessible.description: qsTr("artist")
 
                             property bool componentCompleted: false

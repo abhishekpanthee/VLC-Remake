@@ -46,6 +46,9 @@ MainViewLoader {
 
     property int headerPositioning: ListView.OverlayHeader
 
+    // VLC redesign: hide the table column headers (compact lists)
+    property bool showColumnHeaders: true
+
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
 
@@ -204,6 +207,7 @@ MainViewLoader {
             preferredHeader: root.header
 
             headerPositioning: root.headerPositioning
+            showColumnHeaders: root.showColumnHeaders
 
             activeFocusOnTab: true
 

@@ -148,6 +148,9 @@ ListViewExt {
                                                       - VLCStyle.contextButton_width - (VLCStyle.contextButton_margin * 2)
 
     property bool sortingFromHeader: true
+
+    // VLC redesign: compact lists (ie. the home sections) have no column headers
+    property bool showColumnHeaders: true
     property bool useCurrentSectionLabel: true
 
     signal actionForSelection( var selection )
@@ -228,6 +231,9 @@ ListViewExt {
 
             DefaultTableViewHeader {
                 id: tableHeader
+
+                visible: root.showColumnHeaders
+                height: visible ? implicitHeight : 0
 
                 anchors {
                     top: headerLoader.bottom

@@ -38,6 +38,9 @@ MainViewLoader {
 
     property int listHeaderPositioning: ListView.OverlayHeader // ListView.InlineHeader, when as a row
 
+    // VLC redesign: hide the table column headers (compact lists)
+    property bool showColumnHeaders: true
+
     // Currently only respected by the list view:
     property bool enableBeginningFade: true
     property bool enableEndFade: true
@@ -258,6 +261,7 @@ MainViewLoader {
             sortModel: _availableRowWidth >= VLCStyle.colWidth(4) ? _sortModelLarge : _sortModelSmall
 
             headerPositioning: root.listHeaderPositioning
+            showColumnHeaders: root.showColumnHeaders
 
             rowHeight: VLCStyle.tableCoverRow_height
 

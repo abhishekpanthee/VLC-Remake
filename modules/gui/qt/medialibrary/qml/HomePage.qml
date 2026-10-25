@@ -212,6 +212,7 @@ Widgets.PageExt {
                 visible: model.count !== 0
 
                 headerPositioning: ListView.InlineHeader
+                showColumnHeaders: false // VLC redesign (Figma: sidebar home)
                 enableBeginningFade: false
                 enableEndFade: false
                 sectionProperty: ""
@@ -292,6 +293,7 @@ Widgets.PageExt {
                 visible: model.count !== 0
 
                 listHeaderPositioning: ListView.InlineHeader
+                showColumnHeaders: false // VLC redesign (Figma: sidebar home)
                 enableBeginningFade: false
                 enableEndFade: false
                 listSectionProperty: ""
@@ -368,6 +370,7 @@ Widgets.PageExt {
                 visible: model.count !== 0
 
                 headerPositioning: ListView.InlineHeader
+                showColumnHeaders: false // VLC redesign (Figma: sidebar home)
                 enableBeginningFade: false
                 enableEndFade: false
                 sectionProperty: ""
@@ -448,6 +451,7 @@ Widgets.PageExt {
                 visible: model.count !== 0
 
                 listHeaderPositioning: ListView.InlineHeader
+                showColumnHeaders: false // VLC redesign (Figma: sidebar home)
                 enableBeginningFade: false
                 enableEndFade: false
                 listSectionProperty: ""
