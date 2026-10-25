@@ -1296,7 +1296,7 @@ KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
 
     searchOptionLabel = new QLabel( qtr("in") );
     searchOption = new QComboBox();
-    searchOption->addItem( qtr("Any field"), ANY_COL );
+    searchOption->addItem( qtr("All Fields"), ANY_COL );
     searchOption->addItem( qtr("Actions"), ACTION_COL );
     searchOption->addItem( qtr("Hotkeys"), HOTKEY_COL );
     searchOption->addItem( qtr("Global Hotkeys"), GLOBAL_HOTKEY_COL );
@@ -1306,7 +1306,7 @@ KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
     table->headerItem()->setText( ACTION_COL, qtr( "Action" ) );
     table->headerItem()->setText( HOTKEY_COL, qtr( "Hotkey" ) );
     table->headerItem()->setToolTip( HOTKEY_COL, qtr( "Application level hotkey" ) );
-    table->headerItem()->setText( GLOBAL_HOTKEY_COL, qtr( "Global" ) );
+    table->headerItem()->setText( GLOBAL_HOTKEY_COL, qtr( "Global Hotkey" ) );
     table->headerItem()->setToolTip( GLOBAL_HOTKEY_COL, qtr( "Desktop level hotkey" ) );
     table->setAlternatingRowColors( true );
     table->setSelectionBehavior( QAbstractItemView::SelectItems );
@@ -1323,6 +1323,15 @@ KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
     finish();
 
     connect( actionSearch, &SearchLineEdit::textChanged, this, &KeySelectorControl::filter );
+
+    /* VLC redesign (Figma: Keyboard Shortcuts): one search field with an
+       inline placeholder and the field filter next to it */
+    actionSearch->setPlaceholderText( qtr( "Search Keyboard Shortcuts..." ) );
+    actionSearch->setMinimumHeight( 34 );
+    searchLabel->hide();
+    searchOptionLabel->hide();
+    searchOption->setMinimumWidth( 200 );
+    searchOption->setMinimumHeight( 34 );
     connect( searchOption, QOverload<int>::of(&QComboBox::activated),
              this, &KeySelectorControl::filter );
 }
