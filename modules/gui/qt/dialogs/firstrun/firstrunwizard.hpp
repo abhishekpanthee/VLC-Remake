@@ -32,7 +32,7 @@ class FirstRunWizard : public QWizard
 
 public:
     explicit FirstRunWizard ( qt_intf_t*, QWidget* parent = nullptr );
-    enum { WELCOME_PAGE, FOLDER_PAGE, COLOR_SCHEME_PAGE, LAYOUT_PAGE };
+    enum { WELCOME_PAGE, FOLDER_PAGE, COLOR_SCHEME_PAGE, LAYOUT_PAGE, SHORTCUTS_PAGE };
     enum { MODERN, CLASSIC };
 
     void addDefaults();
@@ -53,6 +53,14 @@ private:
     QButtonGroup* colorSchemeGroup = nullptr;
     QButtonGroup* colorSchemeImages = nullptr;
     QButtonGroup* layoutImages = nullptr;
+
+    /* VLC redesign (Figma: Onboarding) */
+    QButtonGroup* accentGroup = nullptr;
+    QString chosenAccent;
+
+    void setupRedesign();
+    void updateSchemeCards();
+    QWizardPage* createShortcutsPage();
 
 private slots:
     void finish();
