@@ -351,7 +351,12 @@ vlc_module_begin ()
     set_shortname( "Qt" )
     set_description( N_("Qt interface") )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
+#ifdef __APPLE__
+    // VLC Remake: the redesigned Qt interface is the default on macOS
+    set_capability( "interface", 201 )
+#else
     set_capability( "interface", 151 )
+#endif
     set_callbacks( OpenIntf, Close )
 
     add_shortcut("qt")

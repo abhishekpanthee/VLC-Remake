@@ -5,7 +5,8 @@ QTBASE_VERSION_FULL := $(QTBASE_VERSION)
 QTBASE_URL := $(QT)/$(QTBASE_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz
 
 ifdef HAVE_MACOSX
-#PKGS += qt
+# VLC Remake: the redesigned Qt interface is used on macOS too
+PKGS += qt
 endif
 ifdef HAVE_WIN32
 PKGS += qt

@@ -10,6 +10,10 @@ DEPS_qtdeclarative = qt $(DEPS_qt) qtdeclarative-tools $(DEPS_qtdeclarative-tool
 ifdef HAVE_WIN32
 PKGS += qtdeclarative
 endif
+ifdef HAVE_MACOSX
+# VLC Remake: the redesigned Qt interface is used on macOS too
+PKGS += qtdeclarative
+endif
 ifneq ($(findstring qt,$(PKGS)),)
 PKGS_TOOLS += qtdeclarative-tools
 endif

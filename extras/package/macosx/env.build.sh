@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-MINIMAL_OSX_VERSION="10.13"
+MINIMAL_OSX_VERSION="${VLC_MINIMAL_OSX_VERSION:-10.13}"
 
 get_actual_arch() {
     if [ "$1" = "aarch64" ]; then

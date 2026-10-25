@@ -8,6 +8,10 @@ DEPS_qtsvg += qt $(DEPS_qt)
 ifdef HAVE_WIN32
 PKGS += qtsvg
 endif
+ifdef HAVE_MACOSX
+# VLC Remake: the redesigned Qt interface is used on macOS too
+PKGS += qtsvg
+endif
 
 ifeq ($(call need_pkg,"Qt6Svg >= $(QTBASE_VERSION_MAJOR)"),)
 PKGS_FOUND += qtsvg
