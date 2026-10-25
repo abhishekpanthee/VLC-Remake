@@ -6,7 +6,7 @@
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
 #  - src (libvlccore) is nedeed by modules
-SUBDIRS = compat po share src modules lib doc bin test
+SUBDIRS = compat po share src modules lib doc bin
 DIST_SUBDIRS = m4 $(SUBDIRS)
 
 EXTRA_DIST = \
@@ -160,8 +160,6 @@ else
 	$(AM_V_GEN)$(LN_S) -f bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 endif
 
-TESTS = test/run_vlc.sh
-dist_noinst_SCRIPTS += test/run_vlc.sh
 
 if BUILD_VLC
 ###############################################################################

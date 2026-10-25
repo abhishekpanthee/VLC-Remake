@@ -1235,11 +1235,7 @@ configure_file(input: 'config.h.meson',
   output: 'config.h',
   configuration: cdata)
 
-if (get_option('tests').allowed())
-    # Integration and non-regression tests, some unittest are there too but the
-    # modules/, src/ and lib/ folders should be favoured for those.
-    subdir('test')
-endif
+# VLC Remake: the integration test suite (test/) is not shipped.
 
 if get_option('rust').allowed()
     warning('''

@@ -5294,7 +5294,6 @@ AC_CONFIG_FILES([
   src/Makefile
   lib/Makefile
   bin/Makefile
-  test/Makefile
 ])
 
 AM_COND_IF([KDE_SOLID], [
