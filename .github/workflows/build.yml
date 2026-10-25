@@ -1,12 +1,31 @@
-# Builds the Windows package (macOS is built locally) with VLC's own packaging scripts
-# (the same recipes as VideoLAN's CI, extras/package/*/build.sh).
+# Builds VLC Remake for Windows, Linux and macOS.
 #
-# - Run it from the Actions tab ("Run workflow"), or
-# - push a tag such as v0.1.0 to also publish a GitHub release.
+# - Actions tab > Build > "Run workflow": choose the platforms to build and,
+#   optionally, a release tag to add the packages to (an existing release,
+#   such as v0.1.4, keeps its other files). Windows is off by default.
+# - Pushing a tag such as v0.3.0 builds all the platforms and publishes a
+#   new release.
 name: Build
 
 on:
   workflow_dispatch:
+    inputs:
+      windows:
+        description: "Build Windows"
+        type: boolean
+        default: false
+      linux:
+        description: "Build Linux"
+        type: boolean
+        default: true
+      macos:
+        description: "Build macOS"
+        type: boolean
+        default: true
+      release_tag:
+        description: "Add the packages to this release, e.g. v0.1.4 (empty: no release)"
+        type: string
+        default: ""
   push:
     tags:
       - "v*"
@@ -18,8 +37,10 @@ env:
   UPSTREAM_CONTRIB_SHA: 3d2ba807064c942952f5699370439b572809a795
 
 jobs:
+  # ---------------------------------------------------------------- Windows
   windows:
     name: Windows x64
+    if: github.event_name == 'push' || inputs.windows
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     container:
@@ -40,7 +61,7 @@ jobs:
             echo "Prebuilt contribs not found, they will be built from source (slow)"
           fi
 
-      - name: Build and package
+      - name: Build
         shell: bash
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -62,7 +83,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          find . -maxdepth 3 -type f \( -name 'vlc-*.exe' -o -name 'vlc-*.zip' -o -name 'vlc-*.7z' -o -name 'vlc-*.msi' \) \
+          find . -maxdepth 3 -type f \( -name 'vlc-*-win64*.exe' -o -name 'vlc-*-win64*.zip' -o -name 'vlc-*-win64*.7z' \) \
                -not -path './dist/*' -exec cp {} dist/ \;
           ls -la dist
           test -n "$(ls dist)"
@@ -73,10 +94,191 @@ jobs:
           name: vlc-remake-windows-x64
           path: dist/*
 
+  # ------------------------------------------------------------------ Linux
+  linux:
+    name: Linux x86_64 (Ubuntu 24.04)
+    if: github.event_name == 'push' || inputs.linux
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config flex bison gettext autopoint libtool python3-pip curl \
+            qt6-base-dev qt6-base-private-dev qt6-declarative-dev qt6-declarative-private-dev \
+            qt6-svg-dev qt6-shadertools-dev qt6-5compat-dev \
+            qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts \
+            qml6-module-qtquick-templates qml6-module-qtquick-window qml6-module-qtqml-workerscript \
+            qml6-module-qt5compat-graphicaleffects qml6-module-qtquick-dialogs \
+            libxcb1-dev libxcb-composite0-dev libxcb-randr0-dev libxcb-shm0-dev libxcb-xkb-dev \
+            libxcb-keysyms1-dev libxkbcommon-dev libxkbcommon-x11-dev libx11-dev \
+            libwayland-dev wayland-protocols libgl-dev libegl-dev libgles-dev libva-dev libvdpau-dev \
+            libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
+            libpulse-dev libasound2-dev \
+            libfreetype-dev libfribidi-dev libharfbuzz-dev libfontconfig-dev libass-dev \
+            libdav1d-dev libmpg123-dev libvorbis-dev libopus-dev libflac-dev libogg-dev \
+            libtheora-dev libspeex-dev libspeexdsp-dev libmatroska-dev libebml-dev libdvbpsi-dev \
+            libxml2-dev libtag1-dev liblua5.2-dev lua5.2 libgcrypt20-dev libgnutls28-dev \
+            libdbus-1-dev libsystemd-dev libsqlite3-dev libjpeg-dev libpng-dev libxxhash-dev zlib1g-dev
+          # VLC needs meson >= 1.10 (Ubuntu 24.04 ships 1.3)
+          sudo python3 -m pip install --break-system-packages "meson>=1.10"
+          meson --version
+
+      - name: Build medialibrary 0.13
+        run: |
+          curl -fsSL -o ml.tar.gz https://archive.ubuntu.com/ubuntu/pool/universe/m/medialibrary/medialibrary_0.13.2.orig.tar.gz
+          mkdir ml && tar -xzf ml.tar.gz -C ml --strip-components=1
+          cd ml
+          meson setup build --prefix=/usr -Dlibvlc=disabled -Dtests=disabled -Dbuildtype=release
+          ninja -C build
+          sudo ninja -C build install
+          DESTDIR="$GITHUB_WORKSPACE/stage" ninja -C build install
+
+      - name: Build VLC
+        run: |
+          meson setup build --prefix=/usr -Dbuildtype=release -Dqt=enabled -Dmedialibrary=enabled -Dtests=disabled
+          ninja -C build
+          DESTDIR="$GITHUB_WORKSPACE/stage" ninja -C build install
+
+      - name: Package
+        run: |
+          set -e
+          APP=vlc-remake
+          rm -rf "$APP" && mkdir "$APP"
+          cp -a stage/usr/. "$APP/"
+          cat > "$APP/vlc-remake" <<'EOF'
+          #!/bin/sh
+          # VLC Remake launcher: runs the bundled VLC from this folder
+          HERE="$(dirname "$(readlink -f "$0")")"
+          LIBDIR="$HERE/lib/x86_64-linux-gnu"
+          export LD_LIBRARY_PATH="$LIBDIR:$HERE/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          # plugins are found in $VLC_LIB_PATH/plugins
+          export VLC_LIB_PATH="$LIBDIR/vlc"
+          export VLC_LIBEXEC_PATH="$HERE/libexec/vlc"
+          export VLC_DATA_PATH="$HERE/share/vlc"
+          exec "$HERE/bin/vlc" "$@"
+          EOF
+          chmod +x "$APP/vlc-remake"
+          # plugins cache (faster startup)
+          LD_LIBRARY_PATH="$APP/lib/x86_64-linux-gnu" "$APP/libexec/vlc/vlc-cache-gen" \
+            "$APP/lib/x86_64-linux-gnu/vlc/plugins" || true
+          # Ubuntu packages providing the libraries the build links to
+          find "$APP" -type f \( -name '*.so*' -o -path "*/bin/*" \) -exec ldd {} \; 2>/dev/null \
+            | awk '/=> \//{print $3}' | sort -u \
+            | grep -v "$GITHUB_WORKSPACE" | xargs -r -n1 dpkg -S 2>/dev/null | cut -d: -f1 | sort -u > pkgs.txt
+          printf '%s\n' qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts \
+            qml6-module-qtquick-templates qml6-module-qtquick-window qml6-module-qtqml-workerscript \
+            qml6-module-qt5compat-graphicaleffects qml6-module-qtquick-dialogs qt6-qpa-plugins >> pkgs.txt
+          {
+            echo "VLC Remake for Linux (built on Ubuntu 24.04, x86_64)"
+            echo
+            echo "1. Install the libraries it needs (Ubuntu 24.04 / Linux Mint 22 / Pop!_OS 24.04):"
+            echo
+            echo "   sudo apt install $(sort -u pkgs.txt | tr '\n' ' ')"
+            echo
+            echo "2. Run it:"
+            echo
+            echo "   ./vlc-remake"
+            echo
+            echo "VLC media player is (c) VideoLAN and the VLC authors, GNU GPL v2 or later."
+          } > "$APP/README-LINUX.txt"
+          mkdir -p dist
+          tar -czf dist/vlc-remake-linux-x86_64.tar.gz "$APP"
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vlc-remake-linux-x86_64
+          path: dist/*
+
+  # ------------------------------------------------------------------ macOS
+  # The Qt contribs are built from source (VideoLAN's prebuilt macOS contribs
+  # do not include Qt). The contrib build is cached and resumed: if a run hits
+  # the time limit, the next run continues where it stopped.
+  macos:
+    name: macOS Apple Silicon
+    if: github.event_name == 'push' || inputs.macos
+    runs-on: macos-15
+    timeout-minutes: 360
+    env:
+      VLC_FORCE_KERNELVERSION: 19
+      VLC_MINIMAL_OSX_VERSION: "12.0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare
+        run: |
+          # meson needs python >= 3.10; build.sh resets PATH but keeps VLC_PATH
+          echo "VLC_PATH=$(dirname "$(command -v python3)")" >> "$GITHUB_ENV"
+          # free disk space for the contribs
+          sudo rm -rf /Library/Developer/CoreSimulator ~/Library/Developer/CoreSimulator || true
+          df -h /
+
+      - name: Restore the contrib build
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            build/contrib
+            contrib/tarballs
+          key: macos-contribs-${{ hashFiles('contrib/src/**') }}-${{ github.run_id }}
+          restore-keys: macos-contribs-${{ hashFiles('contrib/src/**') }}-
+
+      - name: Build contribs and VLC
+        id: build
+        timeout-minutes: 300
+        continue-on-error: true
+        run: |
+          mkdir -p build && cd build
+          # -c: contribs from source (Qt is not in the prebuilt ones)
+          ../extras/package/macosx/build.sh -c -a aarch64 -j "$(sysctl -n hw.ncpu)"
+
+      - name: Save the contrib build
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            build/contrib
+            contrib/tarballs
+          key: macos-contribs-${{ hashFiles('contrib/src/**') }}-${{ github.run_id }}
+
+      - name: Finish VLC and make the disk image
+        run: |
+          cd build
+          test -f Makefile || { echo "VLC was not configured: the contrib build did not finish, run the workflow again to resume it"; exit 1; }
+          grep -E "^enable_qt=" config.log || true
+          SDK="$(xcrun --sdk macosx --show-sdk-path)"
+          # configure loses the SDK of the Objective-C compilers with recent Xcode
+          FIX="OBJC=$(xcrun --find clang) -isysroot $SDK -mmacosx-version-min=$VLC_MINIMAL_OSX_VERSION"
+          FIXXX="OBJCXX=$(xcrun --find clang++) -isysroot $SDK -mmacosx-version-min=$VLC_MINIMAL_OSX_VERSION"
+          make -j"$(sysctl -n hw.ncpu)" "$FIX" "$FIXXX"
+          make "$FIX" "$FIXXX" VLC.app
+          make "$FIX" "$FIXXX" package-macosx
+          mkdir -p ../dist
+          for f in vlc-*.dmg; do cp "$f" "../dist/${f%.dmg}-arm64.dmg"; done
+          ls -la ../dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vlc-remake-macos-arm64
+          path: dist/*
+
+  # ---------------------------------------------------------------- Release
   release:
     name: Release
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [windows]
+    # publish the packages that were built (a platform that failed or was not
+    # selected is simply missing), to the tag pushed or the release_tag input
+    if: >-
+      always() &&
+      (startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != '') &&
+      contains(needs.*.result, 'success')
+    needs: [windows, linux, macos]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -87,13 +289,20 @@ jobs:
           merge-multiple: true
 
       - name: Checksums
-        run: cd dist && sha256sum * | tee SHA256SUMS
+        # one file per run, so adding packages to a release keeps the other checksums
+        run: cd dist && sha256sum * | tee "SHA256SUMS-run${{ github.run_number }}.txt"
 
       - uses: softprops/action-gh-release@v2
         with:
-          name: VLC Remake ${{ github.ref_name }}
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          name: VLC Remake ${{ inputs.release_tag || github.ref_name }}
           files: dist/*
           body: |
             Unofficial build of VLC media player with the redesigned interface.
             VLC media player is © VideoLAN and the VLC authors, GNU GPL v2 or later.
+
+            - **Windows**: `vlc-4.0.0-dev-win64.exe` (installer) or the `.zip` (portable).
+            - **macOS** (Apple Silicon, macOS 12+): the `.dmg`, if present. Right click > Open the first time.
+            - **Linux** (Ubuntu 24.04): `vlc-remake-linux-x86_64.tar.gz`, see README-LINUX.txt inside.
+
             The packages are not code signed (see the README).

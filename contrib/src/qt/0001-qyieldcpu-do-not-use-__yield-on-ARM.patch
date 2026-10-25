@@ -1,0 +1,13 @@
+--- a/src/corelib/thread/qyieldcpu.h
++++ b/src/corelib/thread/qyieldcpu.h
+@@ -31,7 +31,9 @@
+     noexcept
+ #endif
+ {
+-#if __has_builtin(__yield)
++// VLC: on ARM, __yield requires <arm_acle.h> (an error with recent clang),
++// use __builtin_arm_yield below instead
++#if __has_builtin(__yield) && !defined(__aarch64__) && !defined(__arm__)
+     __yield();              // Generic
+ #elif defined(_YIELD_PROCESSOR) && defined(Q_CC_MSVC)
+     _YIELD_PROCESSOR();     // Generic; MSVC's <atomic>
