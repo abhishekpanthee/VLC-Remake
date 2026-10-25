@@ -1,0 +1,132 @@
+# Builds the Windows and macOS packages with VLC's own packaging scripts
+# (the same recipes as VideoLAN's CI, extras/package/*/build.sh).
+#
+# - Run it from the Actions tab ("Run workflow"), or
+# - push a tag such as v0.1.0 to also publish a GitHub release.
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+env:
+  # Last upstream VLC commit that changed contrib/, extras/tools/ or extras/ci/
+  # (this repository has no upstream history). VideoLAN publishes prebuilt
+  # contribs for it; when they are unavailable, contribs are built from source.
+  UPSTREAM_CONTRIB_SHA: 3d2ba807064c942952f5699370439b572809a795
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    container:
+      # VideoLAN's Windows cross-compilation image (see upstream extras/ci/gitlab-ci.yml)
+      image: registry.videolan.org/vlc-debian-win64-posix:20260611225331
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use prebuilt contribs if available
+        shell: bash
+        run: |
+          url="https://artifacts.videolan.org/vlc/win64/vlc-contrib-x86_64-w64-mingw32-${UPSTREAM_CONTRIB_SHA}.tar.zst"
+          if extras/ci/check-url.sh "$url"; then
+            echo "VLC_PREBUILT_CONTRIBS_URL=$url" >> "$GITHUB_ENV"
+          else
+            echo "Prebuilt contribs not found, they will be built from source (slow)"
+          fi
+
+      - name: Build and package
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # -r release, -p prebuilt contribs (falls back to building them), -i n installer + archives
+          extras/package/win32/build.sh -a x86_64 -r -p -i n
+
+      - name: Collect packages
+        shell: bash
+        run: |
+          mkdir -p dist
+          find . -maxdepth 3 -type f \( -name 'vlc-*.exe' -o -name 'vlc-*.zip' -o -name 'vlc-*.7z' -o -name 'vlc-*.msi' \) \
+               -not -path './dist/*' -exec cp {} dist/ \;
+          ls -la dist
+          test -n "$(ls dist)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vlc-remake-windows-x64
+          path: dist/*
+
+  macos:
+    name: macOS ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            runner: macos-14
+            group: macos-arm64
+          - arch: x86_64
+            runner: macos-13
+            group: macos-x86_64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 360
+    env:
+      VLC_FORCE_KERNELVERSION: 19
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use prebuilt contribs if available
+        run: |
+          url="https://artifacts.videolan.org/vlc/${{ matrix.group }}/vlc-contrib-${{ matrix.arch }}-apple-darwin${VLC_FORCE_KERNELVERSION}-${UPSTREAM_CONTRIB_SHA}.tar.zst"
+          if extras/ci/check-url.sh "$url"; then
+            echo "VLC_PREBUILT_CONTRIBS_URL=$url" >> "$GITHUB_ENV"
+          else
+            echo "Prebuilt contribs not found, they will be built from source (slow)"
+          fi
+
+      - name: Build and package
+        run: |
+          mkdir -p build && cd build
+          # -i n: disk image (unsigned)
+          ../extras/package/macosx/build.sh -i n -a ${{ matrix.arch }} -j "$(sysctl -n hw.ncpu)"
+
+      - name: Collect packages
+        run: |
+          mkdir -p dist
+          find build -maxdepth 2 -type f \( -name 'vlc-*.dmg' -o -name 'vlc-*.tar.gz' \) -exec cp {} dist/ \;
+          for f in dist/*; do mv "$f" "${f%.*}-${{ matrix.arch }}.${f##*.}"; done
+          ls -la dist
+          test -n "$(ls dist)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vlc-remake-macos-${{ matrix.arch }}
+          path: dist/*
+
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, macos]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd dist && sha256sum * | tee SHA256SUMS
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: VLC Remake ${{ github.ref_name }}
+          files: dist/*
+          body: |
+            Unofficial build of VLC media player with the redesigned interface.
+            VLC media player is © VideoLAN and the VLC authors, GNU GPL v2 or later.
+            The packages are not code signed (see the README).
