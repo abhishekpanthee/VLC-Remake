@@ -253,7 +253,7 @@ jobs:
           cp -a stage/usr/. AppDir/usr/
           LIBDIR=usr/lib/x86_64-linux-gnu
           cat > AppDir/apprun-hooks/vlc-remake.sh <<'EOF'
-          export LD_LIBRARY_PATH="$APPDIR/usr/lib:$APPDIR/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          export LD_LIBRARY_PATH="$APPDIR/usr/lib:$APPDIR/usr/lib/x86_64-linux-gnu:$APPDIR/usr/lib/x86_64-linux-gnu/vlc${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
           export VLC_LIB_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/vlc"
           export VLC_LIBEXEC_PATH="$APPDIR/usr/libexec/vlc"
           export VLC_DATA_PATH="$APPDIR/usr/share/vlc"
@@ -261,6 +261,8 @@ jobs:
           printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=VLC Remake' 'Exec=vlc %U' \
             'Icon=vlc-remake' 'Categories=AudioVideo;Player;Video;Audio;' 'Terminal=false' > vlc-remake.desktop
           cp share/icons/256x256/vlc.png vlc-remake.png
+          # libvlc, libvlccore (AppDir/$LIBDIR) and VLC's helper libraries (AppDir/$LIBDIR/vlc)
+          export LD_LIBRARY_PATH="$PWD/AppDir/$LIBDIR:$PWD/AppDir/$LIBDIR/vlc:$PWD/AppDir/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
           ./linuxdeploy --appdir AppDir -e AppDir/usr/bin/vlc \
             --deploy-deps-only "AppDir/$LIBDIR/vlc/plugins" --deploy-deps-only "AppDir/$LIBDIR" \
             -d vlc-remake.desktop -i vlc-remake.png --plugin qt --output appimage
