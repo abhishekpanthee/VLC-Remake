@@ -111,6 +111,25 @@ class VLCIcons : public QObject {
     Q_PROPERTY(QChar medialibrary_remove MEMBER medialibrary_remove CONSTANT FINAL)
     Q_PROPERTY(QChar regex MEMBER regex CONSTANT FINAL)
     Q_PROPERTY(QChar ic_fluent_text_change_case_24_regular MEMBER ic_fluent_text_change_case_24_regular CONSTANT FINAL)
+    Q_PROPERTY(QChar skip_back_15 MEMBER skip_back_15 CONSTANT FINAL)
+    Q_PROPERTY(QChar skip_for_15 MEMBER skip_for_15 CONSTANT FINAL)
+    Q_PROPERTY(QChar pip MEMBER pip CONSTANT FINAL)
+    Q_PROPERTY(QChar hdr MEMBER hdr CONSTANT FINAL)
+    Q_PROPERTY(QChar playback_speed MEMBER playback_speed CONSTANT FINAL)
+    Q_PROPERTY(QChar subtitles MEMBER subtitles CONSTANT FINAL)
+    Q_PROPERTY(QChar audio MEMBER audio CONSTANT FINAL)
+    Q_PROPERTY(QChar chapters MEMBER chapters CONSTANT FINAL)
+    Q_PROPERTY(QChar bookmarks MEMBER bookmarks CONSTANT FINAL)
+    Q_PROPERTY(QChar favorite MEMBER favorite CONSTANT FINAL)
+    Q_PROPERTY(QChar quit MEMBER quit CONSTANT FINAL)
+    Q_PROPERTY(QChar preferences MEMBER preferences CONSTANT FINAL)
+    Q_PROPERTY(QChar playback_settings MEMBER playback_settings CONSTANT FINAL)
+    Q_PROPERTY(QChar songs MEMBER songs CONSTANT FINAL)
+    Q_PROPERTY(QChar videos MEMBER videos CONSTANT FINAL)
+    Q_PROPERTY(QChar sidebar_right MEMBER sidebar_right CONSTANT FINAL)
+    Q_PROPERTY(QChar replay MEMBER replay CONSTANT FINAL)
+    Q_PROPERTY(QChar zoom MEMBER zoom CONSTANT FINAL)
+    Q_PROPERTY(QChar lists MEMBER lists CONSTANT FINAL)
 
 
 public:
@@ -218,6 +237,25 @@ public:
     static constexpr inline QChar medialibrary_remove{ u'\ue05e' };
     static constexpr inline QChar regex{ u'\ue05f' };
     static constexpr inline QChar ic_fluent_text_change_case_24_regular{ u'\ue060' };
+    static constexpr inline QChar skip_back_15{ u'\ue061' };
+    static constexpr inline QChar skip_for_15{ u'\ue062' };
+    static constexpr inline QChar pip{ u'\ue063' };
+    static constexpr inline QChar hdr{ u'\ue064' };
+    static constexpr inline QChar playback_speed{ u'\ue065' };
+    static constexpr inline QChar subtitles{ u'\ue066' };
+    static constexpr inline QChar audio{ u'\ue067' };
+    static constexpr inline QChar chapters{ u'\ue068' };
+    static constexpr inline QChar bookmarks{ u'\ue069' };
+    static constexpr inline QChar favorite{ u'\ue06a' };
+    static constexpr inline QChar quit{ u'\ue06b' };
+    static constexpr inline QChar preferences{ u'\ue06c' };
+    static constexpr inline QChar playback_settings{ u'\ue06d' };
+    static constexpr inline QChar songs{ u'\ue06e' };
+    static constexpr inline QChar videos{ u'\ue06f' };
+    static constexpr inline QChar sidebar_right{ u'\ue070' };
+    static constexpr inline QChar replay{ u'\ue071' };
+    static constexpr inline QChar zoom{ u'\ue072' };
+    static constexpr inline QChar lists{ u'\ue073' };
 
 };
 
