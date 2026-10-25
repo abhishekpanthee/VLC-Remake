@@ -19,6 +19,7 @@
 #define VLC_QT_WIDGETTHEME_HPP
 
 #include <QColor>
+#include <QIcon>
 
 class QApplication;
 
@@ -37,6 +38,17 @@ namespace WidgetTheme
 
     /** whether the system (platform) palette is dark, captured at first call */
     bool systemIsDark();
+
+    /** tokens of the theme last applied (dark tokens by default) */
+    QColor accent();
+    QColor textPrimary();      // Dark/FG/1
+    QColor textSecondary();    // Dark/FG/A2
+    QColor textTertiary();     // Dark/FG/A3
+    QColor selection();        // Dark/BG/A1
+    QColor panel();            // Dark/BG/A4
+
+    /** renders a glyph of the VLCIcons font as an icon (normal / checked colors) */
+    QIcon glyphIcon(QChar glyph, int size, const QColor& normal, const QColor& checked);
 }
 
 #endif // VLC_QT_WIDGETTHEME_HPP

@@ -130,6 +130,13 @@ class VLCIcons : public QObject {
     Q_PROPERTY(QChar replay MEMBER replay CONSTANT FINAL)
     Q_PROPERTY(QChar zoom MEMBER zoom CONSTANT FINAL)
     Q_PROPERTY(QChar lists MEMBER lists CONSTANT FINAL)
+    Q_PROPERTY(QChar prefs_interface MEMBER prefs_interface CONSTANT FINAL)
+    Q_PROPERTY(QChar hotkeys MEMBER hotkeys CONSTANT FINAL)
+    Q_PROPERTY(QChar privacy MEMBER privacy CONSTANT FINAL)
+    Q_PROPERTY(QChar plugins MEMBER plugins CONSTANT FINAL)
+    Q_PROPERTY(QChar edit MEMBER edit CONSTANT FINAL)
+    Q_PROPERTY(QChar refresh MEMBER refresh CONSTANT FINAL)
+    Q_PROPERTY(QChar artist MEMBER artist CONSTANT FINAL)
 
 
 public:
@@ -256,6 +263,13 @@ public:
     static constexpr inline QChar replay{ u'\ue071' };
     static constexpr inline QChar zoom{ u'\ue072' };
     static constexpr inline QChar lists{ u'\ue073' };
+    static constexpr inline QChar prefs_interface{ u'\ue074' };
+    static constexpr inline QChar hotkeys{ u'\ue075' };
+    static constexpr inline QChar privacy{ u'\ue076' };
+    static constexpr inline QChar plugins{ u'\ue077' };
+    static constexpr inline QChar edit{ u'\ue078' };
+    static constexpr inline QChar refresh{ u'\ue079' };
+    static constexpr inline QChar artist{ u'\ue07a' };
 
 };
 

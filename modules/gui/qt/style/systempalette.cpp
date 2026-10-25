@@ -690,11 +690,14 @@ void SystemPalette::makeLightPalette()
     //Switch (Figma: Toggle - on: dimmed accent track + accent knob)
     {
         C::ColorSet CS = C::Switch;
-        setColor(CS, C::Bg, C::Primary, C::Normal, lBgA2);
-        setColor(CS, C::Fg, C::Primary, C::Normal, lFgA3);
+        setColor(CS, C::Bg, C::Primary, C::Normal, lBgA3);
+        setColor(CS, C::Fg, C::Primary, C::Normal, lBgA5);
         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
         setColor(CS, C::Bg, C::Secondary, C::Normal, accentBg);
         setColor(CS, C::Fg, C::Secondary, C::Normal, accent);
+        setColor(CS, C::Bg, C::Highlight, C::Normal, lBgA2);
+        setColor(CS, C::Fg, C::Highlight, C::Normal, lFgA3);
+        setColor(CS, C::Fg, C::Neutral, C::Normal, accent.darker(130));
     }
 
     //SpinBox
@@ -860,11 +863,12 @@ void SystemPalette::makeDarkPalette()
     //Standard Buttons (Figma: "Cancel")
     {
         C::ColorSet CS = C::ButtonStandard;
-        setColor(CS, C::Bg, C::Primary, C::Normal, dBgA1);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, dDividerBright);
-        setColor(CS, C::Bg, C::Primary, C::Pressed, dFgA4);
+        // Figma: dialog "Cancel" / "Back" buttons
+        setColor(CS, C::Bg, C::Primary, C::Normal, dBgA3);
+        setColor(CS, C::Bg, C::Primary, C::Hovered, dBgA1);
+        setColor(CS, C::Bg, C::Primary, C::Pressed, dDividerBright);
 
-        setColor(CS, C::Fg, C::Primary, C::Normal, dFg2);
+        setColor(CS, C::Fg, C::Primary, C::Normal, dFgA2);
         setColor(CS, C::Fg, C::Primary, C::Focused, dFg1);
         setColor(CS, C::Fg, C::Primary, C::Hovered, dFg1);
         setColor(CS, C::Fg, C::Primary, C::Disabled, dFgA4);
@@ -921,11 +925,17 @@ void SystemPalette::makeDarkPalette()
     //Switch (Figma: Toggle - on: dimmed accent track + accent knob)
     {
         C::ColorSet CS = C::Switch;
-        setColor(CS, C::Bg, C::Primary, C::Normal, dBgA1);
-        setColor(CS, C::Fg, C::Primary, C::Normal, dFgA3);
+        // Figma: Toggle - track Dark/BG/B2, knob Dark/FG/A4 (off) or
+        // Dark/Accent/DIm (on), label block Dark/BG/A4 + "OFF" Dark/FG/A3 (off)
+        // or Dark/BG/Accent Bright + "ON" accent (on)
+        setColor(CS, C::Bg, C::Primary, C::Normal, dBgB2);
+        setColor(CS, C::Fg, C::Primary, C::Normal, dFgA4);
         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
         setColor(CS, C::Bg, C::Secondary, C::Normal, accentBg);
-        setColor(CS, C::Fg, C::Secondary, C::Normal, accent);
+        setColor(CS, C::Fg, C::Secondary, C::Normal, scaleColor(accent, 0.81));
+        setColor(CS, C::Bg, C::Highlight, C::Normal, dBgA4);
+        setColor(CS, C::Fg, C::Highlight, C::Normal, dFgA3);
+        setColor(CS, C::Fg, C::Neutral, C::Normal, accent);
     }
 
     //Spinbox

@@ -27,6 +27,8 @@
 #endif
 
 #include "simple_preferences.hpp"
+#include "style/widgettheme.hpp"
+#include "style/vlcicons.hpp"
 #include "preferences_widgets.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "maininterface/mainctx.hpp"
@@ -223,30 +225,35 @@ private:
 SPrefsCatList::SPrefsCatList( qt_intf_t *_p_intf, QWidget *_parent ) :
                                   QWidget( _parent ), p_intf( _p_intf )
 {
-    QHBoxLayout *layout = new QHBoxLayout();
+    /* VLC redesign (Figma: Settings): a vertical list of categories, grouped
+       under "App" and "Media" labels, each with a 24px line icon */
+    QVBoxLayout *layout = new QVBoxLayout();
 
     /* Use autoExclusive buttons and a mapper as QButtonGroup can't
        set focus (keys) when it manages the buttons's exclusivity.
        See QT bugs 131 & 816 and QAbstractButton's source code. */
     QSignalMapper *mapper = new QSignalMapper( layout );
     connect( mapper, &QSignalMapper::mappedInt, this, &SPrefsCatList::switchPanel );
-    qreal dpr = devicePixelRatioF();
 
-    auto addCategory = [&]( QString label, QString ltooltip, QString icon, int numb) {
+    const QColor iconColor = WidgetTheme::textSecondary();
+    const QColor iconCheckedColor = WidgetTheme::accent();
+
+    auto addGroup = [&]( QString label ) {
+        QLabel *group = new QLabel( label, this );
+        group->setObjectName( "vlcPrefsGroup" );
+        layout->addWidget( group );
+    };
+
+    auto addCategory = [&]( QString label, QString ltooltip, QChar glyph, int numb) {
         QToolButton * button = new QToolButton( this );
-        /* Scale icon to non native size outside of toolbutton to avoid widget size */
-        /* computation using native size */
-        QPixmap scaled = QPixmap( icon )
-              .scaledToHeight( ICON_HEIGHT * dpr, Qt::SmoothTransformation );
-        scaled.setDevicePixelRatio( dpr );
-        button->setIcon( scaled );
+        button->setObjectName( "vlcPrefsCategory" );
+        button->setIcon( WidgetTheme::glyphIcon( glyph, 24, iconColor, iconCheckedColor ) );
+        button->setIconSize( QSize( 24, 24 ) );
         button->setText( label );
         button->setToolTip( ltooltip );
-        button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-        button->setIconSize( QSize( ICON_WIDTH, ICON_HEIGHT ) );
-        button->setMinimumWidth( 40 + ICON_WIDTH );
-        button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-        button->setAutoRaise( true );
+        button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+        button->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+        button->setFixedHeight( 40 );
         button->setCheckable( true );
         button->setAutoExclusive( true );
         connect( button, &QToolButton::clicked, mapper, QOverload<>::of(&QSignalMapper::map) );
@@ -254,22 +261,38 @@ SPrefsCatList::SPrefsCatList( qt_intf_t *_p_intf, QWidget *_parent ) :
         layout->addWidget( button );
     };
 
-    addCategory( qfut(INTF_TITLE), qfut(INTF_TOOLTIP), ":/prefsmenu/spref_interface.png" , SPrefsInterface );
-    addCategory( qfut(AUDIO_TITLE), qfut(AUDIO_TOOLTIP), ":/prefsmenu/spref_audio.png", SPrefsAudio );
-    addCategory( qfut(VIDEO_TITLE), qfut(VIDEO_TOOLTIP), ":/prefsmenu/spref_video.png", SPrefsVideo );
-    addCategory( qfut(SUBPIC_TITLE), qfut(SUBPIC_TOOLTIP), ":/prefsmenu/spref_subtitles.png", SPrefsSubtitles );
-    addCategory( qfut(INPUT_TITLE), qfut(INPUT_TOOLTIP), ":/prefsmenu/spref_input.png", SPrefsInputAndCodecs );
-    addCategory( qfut(HOTKEYS_TITLE), qfut(HOTKEYS_TOOLTIP), ":/prefsmenu/spref_hotkeys.png", SPrefsHotkeys );
+    addGroup( qtr( "App" ) );
+    addCategory( qfut(INTF_TITLE), qfut(INTF_TOOLTIP), VLCIcons::prefs_interface, SPrefsInterface );
+    addCategory( qtr( "Controls" ), qfut(HOTKEYS_TOOLTIP), VLCIcons::hotkeys, SPrefsHotkeys );
+    addGroup( qtr( "Media" ) );
+    addCategory( qtr( "Playback" ), qfut(INPUT_TOOLTIP), VLCIcons::play_filled, SPrefsInputAndCodecs );
+    addCategory( qfut(VIDEO_TITLE), qfut(VIDEO_TOOLTIP), VLCIcons::topbar_video, SPrefsVideo );
+    addCategory( qfut(AUDIO_TITLE), qfut(AUDIO_TOOLTIP), VLCIcons::audio, SPrefsAudio );
+    addCategory( qtr( "Subtitles" ), qfut(SUBPIC_TOOLTIP), VLCIcons::subtitles, SPrefsSubtitles );
     if ( vlc_ml_instance_get( p_intf ) != nullptr )
-        addCategory( qfut(ML_TITLE), qfut(ML_TOOLTIP), ":/prefsmenu/spref_medialibrary.png", SPrefsMediaLibrary );
+        addCategory( qtr( "Library" ), qfut(ML_TOOLTIP), VLCIcons::ic_fluent_folder_open_24_regular, SPrefsMediaLibrary );
+    layout->addStretch( 1 );
 
     qobject_cast<QToolButton*>(mapper->mapping(SPrefsInterface))->setChecked(true);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing( 1 );
+    layout->setContentsMargins( 6, 6, 6, 6 );
+    layout->setSpacing( 8 );
 
-    setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Preferred);
-    setMinimumWidth( ICON_HEIGHT * 6 + 10 );
+    setObjectName( "vlcPrefsSidebar" );
+    setAttribute( Qt::WA_StyledBackground, true );
+    setFixedWidth( 200 );
+    setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Expanding );
     setLayout( layout );
+
+    const auto c = [](const QColor& color) { return color.name(); };
+    setStyleSheet( QStringLiteral(
+        "QWidget#vlcPrefsSidebar { background: %1; border-radius: 6px; }"
+        "QLabel#vlcPrefsGroup { color: %2; padding: 8px 10px; font-size: 14px; }"
+        "QToolButton#vlcPrefsCategory { background: transparent; color: %3; border: none;"
+        "  border-radius: 2px; padding: 4px 8px; font-size: 14px; text-align: left; }"
+        "QToolButton#vlcPrefsCategory:hover { color: %4; }"
+        "QToolButton#vlcPrefsCategory:checked { background: %5; color: %4; }" )
+        .arg( c( WidgetTheme::panel() ), c( WidgetTheme::textTertiary() ), c( WidgetTheme::textSecondary() ),
+              c( WidgetTheme::textPrimary() ), c( WidgetTheme::selection() ) ) );
 }
 
 void SPrefsCatList::switchPanel( int i )
@@ -363,14 +386,19 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
     // Title Label
     QLabel *panel_label = new QLabel;
+    // VLC redesign (Figma: Settings header title, 16px Dark/FG/A1)
     QFont labelFont = QApplication::font();
-    labelFont.setPointSize( labelFont.pointSize() + 6 );
+    labelFont.setPixelSize( 16 );
     panel_label->setFont( labelFont );
+    panel_label->setObjectName( "vlcPrefsTitle" );
+    panel_label->setStyleSheet( QStringLiteral( "color: %1; padding: 6px 0px 10px 0px;" )
+                                .arg( WidgetTheme::textSecondary().name() ) );
 
     // Title <hr>
     QFrame *title_line = new QFrame;
     title_line->setFrameShape(QFrame::HLine);
     title_line->setFrameShadow(QFrame::Sunken);
+    title_line->hide(); // the redesign has no rule under the title
 
     QFont italicFont = QApplication::font();
     italicFont.setItalic( true );
@@ -384,7 +412,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         {
             auto& ui = m_videoUI;
             ui.setupUi( panel );
-            panel_label->setText( qtr("Video Settings") );
+            panel_label->setText( qtr("Video Preferences") );
 
             configBool( "video", ui.enableVideo );
             ui.videoZone->setEnabled( ui.enableVideo->isChecked() );
@@ -446,7 +474,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         {
             auto& ui = m_audioUI;
             ui.setupUi( panel );
-            panel_label->setText( qtr("Audio Settings") );
+            panel_label->setText( qtr("Audio Preferences") );
 
             configBool( "audio", ui.enableAudio );
             ui.audioZone->setEnabled( ui.enableAudio->isChecked() );
@@ -604,7 +632,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         {
             auto& ui = m_inputCodecUI;
             ui.setupUi( panel );
-            panel_label->setText( qtr("Input & Codecs Settings") );
+            panel_label->setText( qtr("Playback Preferences") );
 
             /* Disk Devices */
             {
@@ -698,7 +726,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         {
             auto& ui = m_interfaceUI;
             ui.setupUi( panel );
-            panel_label->setText( qtr("Interface Settings") );
+            panel_label->setText( qtr("Interface Preferences") );
 
 #ifndef _WIN32
             ui.langBox->hide();
@@ -934,7 +962,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         {
             auto& ui = m_subtitlesUI;
             ui.setupUi( panel );
-            panel_label->setText( qtr("Subtitle & On Screen Display Settings") );
+            panel_label->setText( qtr("Subtitles Preferences") );
 
             configBool( "osd", ui.OSDBox);
             configBool( "video-title-show", ui.OSDTitleBox);
@@ -988,7 +1016,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             panel->setLayout( gLayout );
             int line = 0;
 
-            panel_label->setText( qtr( "Configure Hotkeys" ) );
+            panel_label->setText( qtr( "Controls Preferences" ) );
             control = new KeySelectorControl( this );
             control->insertInto( gLayout, line );
             controls.append( control );
@@ -1025,7 +1053,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         {
             auto& ui = m_medialibUI;
             ui.setupUi( panel );
-            panel_label->setText( qtr("Media Library Settings") );
+            panel_label->setText( qtr("Library Preferences") );
 
             if ( vlc_ml_instance_get( p_intf ) != NULL )
             {

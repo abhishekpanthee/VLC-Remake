@@ -76,7 +76,7 @@ T.Switch {
         if (checked)
             handle.x = handle.drag.maximumX
         else
-            handle.x = 0
+            handle.x = handle.drag.minimumX
     }
 
     onCheckedChanged: {
@@ -89,7 +89,7 @@ T.Switch {
         if (checked)
             to = handle.drag.maximumX
         else
-            to = 0
+            to = handle.drag.minimumX
 
         _animate(from, to)
     }
@@ -105,7 +105,7 @@ T.Switch {
         _update = false
 
         if (x < width / 2) {
-            to = 0
+            to = handle.drag.minimumX
 
             checked = false
         } else {
@@ -160,30 +160,47 @@ T.Switch {
         border.color: root.visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
     }
 
+    // VLC redesign (Figma: Toggle): a 68x32 track, a square knob and an
+    // "ON" / "OFF" label block on the opposite side
     indicator: Rectangle {
         anchors.fill: parent
 
-        anchors.margins: VLCStyle.checkButton_margins
+        radius: VLCStyle.radius_normal
 
-        radius: height / 2
+        color: theme.bg.primary
 
-        color: root.color
+        // label block
+        Rectangle {
+            x: root.checked ? VLCStyle.checkButton_margins
+                            : parent.width - width - VLCStyle.checkButton_margins
+            y: VLCStyle.checkButton_margins
+            width: parent.width - handle.width - VLCStyle.checkButton_margins * 3
+            height: parent.height - VLCStyle.checkButton_margins * 2
 
-        border.color: root.colorBorder
-        border.width: VLCStyle.border
-        border.pixelAligned: (radius < Number.EPSILON)
+            radius: VLCStyle.dp(3, VLCStyle.scale)
+            color: root.checked ? theme.bg.secondary : theme.bg.highlight
+
+            T.Label {
+                anchors.centerIn: parent
+                text: root.checked ? qsTr("ON") : qsTr("OFF")
+                color: root.checked ? theme.fg.neutral : theme.fg.highlight
+                font.pixelSize: VLCStyle.fontSize_normal
+                font.weight: Font.Normal
+            }
+        }
 
         MouseArea {
             id: handle
 
+            y: VLCStyle.checkButton_margins
             width: Math.round(root.height - VLCStyle.checkButton_margins * 2)
             height: width
 
             drag.target: handle
             drag.axis  : Drag.XAxis
 
-            drag.minimumX: 0
-            drag.maximumX: parent.width - width
+            drag.minimumX: VLCStyle.checkButton_margins
+            drag.maximumX: parent.width - width - VLCStyle.checkButton_margins
 
             onClicked: root.toggle()
 
@@ -193,9 +210,7 @@ T.Switch {
             Rectangle {
                 anchors.fill: parent
 
-                anchors.margins: VLCStyle.checkButton_handle_margins
-
-                radius: height / 2
+                radius: VLCStyle.dp(3, VLCStyle.scale)
 
                 color: root.colorHandle
             }

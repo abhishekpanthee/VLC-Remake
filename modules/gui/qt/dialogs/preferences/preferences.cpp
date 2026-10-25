@@ -99,7 +99,8 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
 
     /* Simple view (panel) */
     simple_split_widget = new QWidget();
-    simple_split_widget->setLayout( new QVBoxLayout );
+    // VLC redesign (Figma: Settings): the categories are a sidebar on the left
+    simple_split_widget->setLayout( new QHBoxLayout );
 
     simple_tree_panel = new QWidget;
     simple_tree_panel->setLayout( new QVBoxLayout );
@@ -111,8 +112,8 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     simple_split_widget->layout()->addWidget( simple_tree_panel );
     simple_split_widget->layout()->addWidget( simple_panels_stack );
 
-    simple_tree_panel->layout()->setContentsMargins(1, 1, 1, 1);
-    simple_panels_stack->setContentsMargins( 6, 0, 0, 3 );
+    simple_tree_panel->layout()->setContentsMargins(0, 0, 0, 0);
+    simple_panels_stack->setContentsMargins( 18, 0, 0, 3 );
     simple_split_widget->layout()->setContentsMargins(0, 0, 0, 0);
 
     stack->insertWidget( SIMPLE, simple_split_widget );

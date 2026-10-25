@@ -178,7 +178,7 @@ QtObject {
     readonly property int button_width_normal: MainCtx.dp(96, scale)
     readonly property int button_width_large: MainCtx.dp(128, scale)
 
-    readonly property real button_radius: MainCtx.dp(4, scale)
+    readonly property real button_radius: MainCtx.dp(6, scale) // Figma: buttons 6px
 
     // VLC redesign corner radii (Figma: 2 = chips/tracks, 4 = buttons & fields,
     // 6 = panels & menus, 10 = dialogs)
@@ -227,11 +227,11 @@ QtObject {
     readonly property int contextButton_width: icon_normal
     readonly property int contextButton_margin: margin_xxsmall
 
-    readonly property int checkButton_width: MainCtx.dp(56, scale)
+    readonly property int checkButton_width: MainCtx.dp(68, scale) // Figma: Toggle 68x32
     readonly property int checkButton_height: MainCtx.dp(32, scale)
 
-    readonly property int checkButton_margins: MainCtx.dp(4, scale)
-    readonly property int checkButton_handle_margins: MainCtx.dp(2, scale)
+    readonly property int checkButton_margins: MainCtx.dp(3, scale)
+    readonly property int checkButton_handle_margins: 0
 
     readonly property int navBoxButton_radius: MainCtx.dp(8, scale)
 

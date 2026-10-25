@@ -25,6 +25,12 @@
 #include <QPalette>
 #include <QStyle>
 #include <QStyleFactory>
+#include <QStandardPaths>
+#include <QDir>
+#include <QFile>
+#include <QFontDatabase>
+#include <QPainter>
+#include <QPixmap>
 
 namespace {
 
@@ -383,6 +389,103 @@ QStatusBar {
              c(t.dividerDim), c(t.bgB2));
 }
 
+
+// Figma: Toggle (68x32). The "ON" / "OFF" labels are kept as vector paths.
+const char* const TOGGLE_ON_LABEL = "M18.42 16.63C18.42 17.55 18.25 18.35 17.92 19.02C17.58 19.69 17.13 20.21 16.55 20.57C15.97 20.93 15.31 21.11 14.56 21.11C13.82 21.11 13.16 20.93 12.58 20.57C12.00 20.21 11.54 19.69 11.21 19.02C10.88 18.35 10.71 17.55 10.71 16.63C10.71 15.71 10.88 14.92 11.21 14.25C11.54 13.57 12.00 13.06 12.58 12.69C13.16 12.33 13.82 12.15 14.56 12.15C15.31 12.15 15.97 12.33 16.55 12.69C17.13 13.06 17.58 13.57 17.92 14.25C18.25 14.92 18.42 15.71 18.42 16.63ZM17.39 16.63C17.39 15.88 17.27 15.24 17.01 14.72C16.76 14.20 16.42 13.80 16 13.54C15.57 13.27 15.09 13.14 14.56 13.14C14.03 13.14 13.56 13.27 13.13 13.54C12.70 13.80 12.36 14.20 12.11 14.72C11.86 15.24 11.73 15.88 11.73 16.63C11.73 17.39 11.86 18.02 12.11 18.54C12.36 19.06 12.70 19.46 13.13 19.73C13.56 19.99 14.03 20.13 14.56 20.13C15.09 20.13 15.57 19.99 16 19.73C16.42 19.46 16.76 19.06 17.01 18.54C17.27 18.02 17.39 17.39 17.39 16.63ZM27.11 12.27V21H26.09L21.33 14.14H21.25V21H20.19V12.27H21.22L25.99 19.14H26.07V12.27H27.11Z";
+const char* const TOGGLE_OFF_LABEL = "M44.42 16.63C44.42 17.55 44.25 18.35 43.92 19.02C43.58 19.69 43.13 20.21 42.55 20.57C41.97 20.93 41.31 21.11 40.56 21.11C39.82 21.11 39.16 20.93 38.58 20.57C38.00 20.21 37.54 19.69 37.21 19.02C36.88 18.35 36.71 17.55 36.71 16.63C36.71 15.71 36.88 14.92 37.21 14.25C37.54 13.57 38.00 13.06 38.58 12.69C39.16 12.33 39.82 12.15 40.56 12.15C41.31 12.15 41.97 12.33 42.55 12.69C43.13 13.06 43.58 13.57 43.92 14.25C44.25 14.92 44.42 15.71 44.42 16.63ZM43.39 16.63C43.39 15.88 43.27 15.24 43.01 14.72C42.76 14.20 42.42 13.80 42 13.54C41.57 13.27 41.09 13.14 40.56 13.14C40.03 13.14 39.56 13.27 39.13 13.54C38.70 13.80 38.36 14.20 38.11 14.72C37.86 15.24 37.73 15.88 37.73 16.63C37.73 17.39 37.86 18.02 38.11 18.54C38.36 19.06 38.70 19.46 39.13 19.73C39.56 19.99 40.03 20.13 40.56 20.13C41.09 20.13 41.57 19.99 42 19.73C42.42 19.46 42.76 19.06 43.01 18.54C43.27 18.02 43.39 17.39 43.39 16.63ZM46.19 21V12.27H51.43V13.21H47.25V16.15H51.03V17.09H47.25V21H46.19ZM53.24 21V12.27H58.47V13.21H54.29V16.15H58.08V17.09H54.29V21H53.24Z";
+
+// writes the toggle images for the given tokens, returns their paths
+std::pair<QString, QString> writeToggleImages(const Tokens& t)
+{
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+                            + QStringLiteral("/redesign");
+    QDir().mkpath(dirPath);
+
+    const auto c = [](const QColor& color) { return color.name(QColor::HexRgb); };
+    const QColor knobOn = QColor::fromRgbF(t.accent.redF() * 0.81f, t.accent.greenF() * 0.81f, t.accent.blueF() * 0.81f);
+
+    const QString on = QStringLiteral(
+        "<svg width=\"68\" height=\"32\" viewBox=\"0 0 68 32\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"68\" height=\"32\" rx=\"6\" fill=\"%1\"/>"
+        "<rect x=\"3\" y=\"3\" width=\"33\" height=\"26\" rx=\"3\" fill=\"%2\"/>"
+        "<rect x=\"39\" y=\"3\" width=\"26\" height=\"26\" rx=\"3\" fill=\"%3\"/>"
+        "<path d=\"%4\" fill=\"%5\"/></svg>")
+        .arg(c(t.bgB2), c(t.accentBg), c(knobOn), QLatin1String(TOGGLE_ON_LABEL), c(t.accent));
+    const QString off = QStringLiteral(
+        "<svg width=\"68\" height=\"32\" viewBox=\"0 0 68 32\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"68\" height=\"32\" rx=\"6\" fill=\"%1\"/>"
+        "<rect x=\"32\" y=\"3\" width=\"33\" height=\"26\" rx=\"3\" fill=\"%2\"/>"
+        "<rect x=\"3\" y=\"3\" width=\"26\" height=\"26\" rx=\"3\" fill=\"%3\"/>"
+        "<path d=\"%4\" fill=\"%5\"/></svg>")
+        .arg(c(t.bgB2), c(t.bgA4), c(t.fgA4), QLatin1String(TOGGLE_OFF_LABEL), c(t.fgA3));
+
+    const QString onPath = dirPath + QStringLiteral("/toggle-on-%1.svg").arg(c(t.accent).mid(1));
+    const QString offPath = dirPath + QStringLiteral("/toggle-off-%1.svg").arg(c(t.bgB2).mid(1));
+    for (const auto& [path, data] : { std::pair{onPath, on}, std::pair{offPath, off} })
+    {
+        QFile file(path);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+            file.write(data.toUtf8());
+    }
+    return { onPath, offPath };
+}
+
+// rules overriding the base style sheet for the redesign buttons and toggles
+QString makeControlsStyleSheet(const Tokens& t)
+{
+    const auto c = [](const QColor& color) { return color.name(QColor::HexRgb); };
+    const auto [onPath, offPath] = writeToggleImages(t);
+
+    return QStringLiteral(R"QSS(
+QPushButton {
+    background: %1;
+    color: %2;
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 6px 16px;
+    min-width: 68px;
+}
+QPushButton:hover {
+    background: %3;
+    color: %4;
+}
+QPushButton:default {
+    background: %5;
+    color: %6;
+}
+QGroupBox {
+    border: none;
+    border-top: 1px solid %9;
+    border-radius: 0px;
+    margin-top: 28px;
+    padding: 14px 0px 8px 0px;
+    font-size: 16px;
+    font-weight: 500;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 0px;
+    padding: 0px;
+    color: %10;
+}
+QCheckBox::indicator {
+    width: 68px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    image: url(%7);
+}
+QCheckBox::indicator:checked {
+    background: transparent;
+    image: url(%8);
+}
+)QSS")
+        .arg(c(t.bgA3), c(t.fgA2), c(t.bgA1), c(t.fg1), c(t.accentBg), c(t.accent), offPath, onPath, c(t.dividerDim))
+        .arg(c(t.fg2));
+}
+
+Tokens s_tokens = darkTokens(QColor());
+
 bool s_systemDarkCaptured = false;
 bool s_systemDark = false;
 
@@ -412,6 +515,47 @@ void WidgetTheme::apply(bool dark, const QColor& customAccent)
         QApplication::setStyle(fusion);
 
     const Tokens tokens = dark ? darkTokens(customAccent) : lightTokens(customAccent);
+    s_tokens = tokens;
     QApplication::setPalette(makePalette(tokens));
-    qApp->setStyleSheet(makeStyleSheet(tokens));
+    qApp->setStyleSheet(makeStyleSheet(tokens) + makeControlsStyleSheet(tokens));
+}
+
+QColor WidgetTheme::accent() { return s_tokens.accent; }
+QColor WidgetTheme::textPrimary() { return s_tokens.fg1; }
+QColor WidgetTheme::textSecondary() { return s_tokens.fgA2; }
+QColor WidgetTheme::textTertiary() { return s_tokens.fgA3; }
+QColor WidgetTheme::selection() { return s_tokens.bgA1; }
+QColor WidgetTheme::panel() { return s_tokens.bgA4; }
+
+QIcon WidgetTheme::glyphIcon(QChar glyph, int size, const QColor& normal, const QColor& checked)
+{
+    static bool fontLoaded = false;
+    if (!fontLoaded)
+    {
+        if (!QFontDatabase::families().contains(QStringLiteral("VLCIcons")))
+            QFontDatabase::addApplicationFont(QStringLiteral(":/VLCIcons.ttf"));
+        fontLoaded = true;
+    }
+
+    const qreal dpr = qApp ? qApp->devicePixelRatio() : 1.0;
+    const auto render = [&](const QColor& color) {
+        QPixmap pixmap(QSize(size, size) * dpr);
+        pixmap.setDevicePixelRatio(dpr);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+        QFont font(QStringLiteral("VLCIcons"));
+        font.setPixelSize(size);
+        painter.setFont(font);
+        painter.setPen(color);
+        painter.drawText(QRect(0, 0, size, size), Qt::AlignCenter, QString(glyph));
+        return pixmap;
+    };
+
+    QIcon icon;
+    icon.addPixmap(render(normal), QIcon::Normal, QIcon::Off);
+    icon.addPixmap(render(checked), QIcon::Normal, QIcon::On);
+    icon.addPixmap(render(checked), QIcon::Active, QIcon::On);
+    return icon;
 }

@@ -468,6 +468,34 @@
         {
             "key": "lists",
             "path": "./icons/redesign/lists.svg"
+        },
+        {
+            "key": "prefs_interface",
+            "path": "./icons/redesign/interface.svg"
+        },
+        {
+            "key": "hotkeys",
+            "path": "./icons/redesign/hotkeys.svg"
+        },
+        {
+            "key": "privacy",
+            "path": "./icons/redesign/privacy.svg"
+        },
+        {
+            "key": "plugins",
+            "path": "./icons/redesign/plugins.svg"
+        },
+        {
+            "key": "edit",
+            "path": "./icons/redesign/edit.svg"
+        },
+        {
+            "key": "refresh",
+            "path": "./icons/redesign/refresh.svg"
+        },
+        {
+            "key": "artist",
+            "path": "./icons/redesign/artist.svg"
         }
     ]
 }
