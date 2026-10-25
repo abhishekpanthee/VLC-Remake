@@ -118,6 +118,11 @@ QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
 	-DFEATURE_keysequenceedit=OFF -DFEATURE_mdiarea=OFF \
 	-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
 
+ifdef HAVE_MACOSX
+# VLC Remake: the macOS style plugin uses QMdiSubWindow unconditionally
+QTBASE_CONFIG += -DFEATURE_mdiarea=ON
+endif
+
 QTBASE_NATIVE_CONFIG := $(QTBASE_COMMON_CONFIG) -DQT_BUILD_TESTS=FALSE \
 	-DFEATURE_accessibility=ON -DFEATURE_widgets=OFF -DFEATURE_testlib=OFF \
 	-DFEATURE_vnc=OFF -DFEATURE_linuxfb=OFF -DFEATURE_xlib=OFF \
