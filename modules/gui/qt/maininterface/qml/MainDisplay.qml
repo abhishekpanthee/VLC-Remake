@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Templates as T
 
 import VLC.Style
 import VLC.MainInterface
@@ -985,12 +986,14 @@ FocusScope {
             anchors {
                 bottom: loaderUpdatePane.top
                 left: parent.left
-                bottomMargin: VLCStyle.margin_normal
-                leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
+                // room for the card caption below the video (pipCard)
+                bottomMargin: VLCStyle.margin_normal + VLCStyle.pipCard_captionHeight + VLCStyle.pipCard_padding
+                leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin + VLCStyle.pipCard_padding
             }
 
-            width: VLCStyle.dp(320, VLCStyle.scale)
-            height: VLCStyle.dp(180, VLCStyle.scale)
+            // VLC redesign (Figma: Miniplayer): 375x211 video
+            width: VLCStyle.pipCard_videoWidth
+            height: VLCStyle.pipCard_videoHeight
             z: 4
             visible: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
             enabled: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
@@ -1008,8 +1011,8 @@ FocusScope {
 
             dragXMin: VLCStyle.applicationHorizontalMargin
             dragXMax: g_mainDisplay.width - playerPip.width - VLCStyle.applicationHorizontalMargin
-            dragYMin: localTopbar.y + localTopbar.height
-            dragYMax: loaderUpdatePane.y - playerPip.height
+            dragYMin: localTopbar.y + localTopbar.height + VLCStyle.pipCard_padding
+            dragYMax: loaderUpdatePane.y - playerPip.height - VLCStyle.pipCard_captionHeight - VLCStyle.pipCard_padding
 
             //keep the player visible on resize
             Connections {
@@ -1023,7 +1026,119 @@ FocusScope {
                         playerPip.y = playerPip.dragYMax
                 }
             }
+
+            // VLC redesign (Figma: Miniplayer): a card around the video with a
+            // caption below. The video is drawn underneath the interface, so the
+            // card is a frame around it and never paints over it.
+            Item {
+                id: pipCard
+
+                readonly property ColorContext colorContext: ColorContext {
+                    id: pipCardTheme
+                    colorSet: ColorContext.MenuBar // Figma: Dark/BG/A3
+                }
+
+                ColorContext {
+                    id: pipCardTextTheme
+                    colorSet: ColorContext.View
+                }
+
+                z: -1
+
+                x: -VLCStyle.pipCard_padding
+                y: -VLCStyle.pipCard_padding
+                width: playerPip.width + VLCStyle.pipCard_padding * 2
+                height: playerPip.height + VLCStyle.pipCard_padding * 2 + VLCStyle.pipCard_captionHeight
+
+                // frame around the video, its inner edge rounds the video corners
+                Rectangle {
+                    x: 0
+                    y: 0
+                    width: parent.width
+                    height: playerPip.height + VLCStyle.pipCard_padding * 2
+                    color: "transparent"
+                    border.color: pipCardTheme.bg.secondary
+                    border.width: VLCStyle.pipCard_padding
+                    radius: VLCStyle.radius_large + VLCStyle.dp(4, VLCStyle.scale)
+
+                    // square bottom corners, the caption continues the card
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        height: VLCStyle.pipCard_padding
+                        color: pipCardTheme.bg.secondary
+                    }
+                }
+
+                Rectangle {
+                    id: pipCaption
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: VLCStyle.pipCard_captionHeight
+
+                    color: pipCardTheme.bg.secondary
+                    radius: VLCStyle.radius_large + VLCStyle.dp(4, VLCStyle.scale)
+
+                    // square top corners
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        height: parent.radius
+                        color: parent.color
+                    }
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: VLCStyle.pipCard_padding
+                        anchors.rightMargin: VLCStyle.pipCard_padding
+                        anchors.bottomMargin: VLCStyle.margin_small
+                        spacing: VLCStyle.margin_small
+
+                        // progress (Figma: 16px, Dark/BG/B2 with the dimmed accent)
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: VLCStyle.dp(16, VLCStyle.scale)
+                            radius: VLCStyle.radius_normal
+                            color: pipCardTextTheme.bg.secondary
+
+                            Rectangle {
+                                x: VLCStyle.dp(2, VLCStyle.scale)
+                                y: VLCStyle.dp(2, VLCStyle.scale)
+                                height: parent.height - VLCStyle.dp(4, VLCStyle.scale)
+                                width: Math.max(0, (parent.width - VLCStyle.dp(4, VLCStyle.scale)) * Player.position)
+                                radius: VLCStyle.radius_small
+                                color: pipCardTextTheme.bg.neutral
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: VLCStyle.margin_xsmall
+                            spacing: VLCStyle.margin_normal
+
+                            T.Label {
+                                Layout.fillWidth: true
+                                text: Player.title
+                                elide: Text.ElideRight
+                                color: pipCardTextTheme.fg.secondary
+                                font.pixelSize: VLCStyle.fontSize_xlarge
+                            }
+
+                            Widgets.IconToolButton {
+                                text: VLCIcons.lists
+                                description: qsTr("Play Queue")
+                                onClicked: pannelVisiblity.togglePlayqueueVisibility()
+                            }
+                        }
+                    }
+                }
+            }
         }
+
     }
 
     Dialogs {

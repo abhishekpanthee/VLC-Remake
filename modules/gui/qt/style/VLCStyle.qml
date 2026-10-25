@@ -221,6 +221,12 @@ QtObject {
     readonly property int editorItem_height: MainCtx.dp(76, scale)
     readonly property int editorItem_boxSize: MainCtx.dp(28, scale)
 
+    // VLC redesign mini player card (Figma: Miniplayer 391x339)
+    readonly property int pipCard_padding: MainCtx.dp(8, scale)
+    readonly property int pipCard_videoWidth: MainCtx.dp(375, scale)
+    readonly property int pipCard_videoHeight: MainCtx.dp(211, scale)
+    readonly property int pipCard_captionHeight: MainCtx.dp(96, scale)
+
     readonly property int tracksPanel_width: MainCtx.dp(400, scale)
     readonly property int tracksPanel_height: MainCtx.dp(524, scale)
 
