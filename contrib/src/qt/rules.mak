@@ -72,8 +72,11 @@ endif
 QTBASE_CONFIG += -DFEATURE_framework=OFF
 
 ifdef HAVE_CROSS_COMPILE
+ifndef HAVE_MACOSX
 # This is necessary to make use of qmake
+# (VLC Remake: not on macOS, Apple's clang has no target prefixed names)
 QTBASE_CONFIG += -DQT_QMAKE_DEVICE_OPTIONS:STRING=CROSS_COMPILE=$(HOST)-
+endif
 endif
 
 ifdef HAVE_MACOSX
