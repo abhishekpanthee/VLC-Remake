@@ -111,7 +111,9 @@ T.ItemDelegate {
                 verticalCenter: parent.verticalCenter
             }
             implicitHeight: parent.height / 2
-            visible: control.checked
+            // VLC redesign: the rail marks the current page with the accent
+            // colored icon only
+            visible: control.checked && control.showText
 
             radius: control.radius / 2
         }

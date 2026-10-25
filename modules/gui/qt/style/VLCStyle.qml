@@ -201,6 +201,16 @@ QtObject {
     readonly property int timeLabel_width: MainCtx.dp(76, scale)
     readonly property int playPill_width: MainCtx.dp(54, scale)
     readonly property int playPill_height: MainCtx.dp(28, scale)
+    // VLC redesign title bar & navigation rail (Figma: topbar, sidebar)
+    readonly property int titleBar_padding: MainCtx.dp(6, scale)
+    readonly property int titleBar_buttonWidth: MainCtx.dp(28, scale)
+    readonly property int titleBar_logoWidth: MainCtx.dp(38, scale)
+    readonly property int titleBar_windowButtonWidth: MainCtx.dp(36, scale)
+    readonly property int navigationRail_width: MainCtx.dp(50, scale)
+    readonly property int navigationRail_padding: MainCtx.dp(8, scale)
+    readonly property int navigationRail_spacing: MainCtx.dp(14, scale)
+    readonly property int navigationRail_buttonSize: MainCtx.dp(30, scale)
+
     readonly property int volumeMeter_width: MainCtx.dp(88, scale)
     readonly property int volumeMeter_height: MainCtx.dp(28, scale)
 

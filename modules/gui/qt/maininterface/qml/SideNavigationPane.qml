@@ -88,9 +88,15 @@ T.Pane {
         }
     }
 
+    // VLC redesign (Figma: sidebar): the icon-only rail uses Dark/BG/A4, the
+    // expanded pane Dark/BG/B1
+    readonly property bool _rail: !delegateShowText
+    // horizontal offset that centers a rail button in the rail
+    readonly property real _railInset: (VLCStyle.navigationRail_width - VLCStyle.navigationRail_buttonSize) / 2
+
     background: Widgets.AcrylicBackground {
         enabled: root.useAcrylic
-        tintColor: theme.bg.primary
+        tintColor: root._rail ? theme.bg.secondary : theme.bg.primary
     }
 
     contentItem:  Item {
@@ -100,10 +106,13 @@ T.Pane {
         //would be parented (and layouted) to the Layout
         ColumnLayout {
             anchors.fill: parent
+            anchors.topMargin: root._rail ? VLCStyle.navigationRail_padding : 0
             spacing: VLCStyle.margin_xsmall
 
             Widgets.ListViewExt {
                 id: listView
+
+                spacing: root._rail ? VLCStyle.navigationRail_spacing : 0
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -163,13 +172,17 @@ T.Pane {
                     width: ListView.view.contentWidth
                     height: preferredHeight
 
-                    property real preferredHeight: shouldShow ? VLCStyle.buttonHeightNavigationPane : 0.0
+                    property real preferredHeight: shouldShow ? (root._rail ? VLCStyle.navigationRail_buttonSize
+                                                                            : VLCStyle.buttonHeightNavigationPane)
+                                                              : 0.0
 
-                    leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
+                    // rail: 30x30 buttons centered in the rail (Figma: Icon Wrapper)
+                    leftPadding: root.safeAreaLeftMargin + (root._rail ? (VLCStyle.navigationRail_width - VLCStyle.icon_banner) / 2
+                                                                       : VLCStyle.margin_xsmall)
                     rightPadding: root.safeAreaRightMargin
 
-                    leftInset: root.safeAreaLeftMargin + implicitLeftInset
-                    rightInset: root.safeAreaRightMargin + implicitRightInset
+                    leftInset: root.safeAreaLeftMargin + (root._rail ? root._railInset : implicitLeftInset)
+                    rightInset: root.safeAreaRightMargin + (root._rail ? root._railInset : implicitRightInset)
 
                     iconTxt: icon_alias
                     text: title
@@ -265,13 +278,14 @@ T.Pane {
                 AccessibleCompat.id: "preferencesButton"
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: VLCStyle.buttonHeightNavigationPane
+                Layout.preferredHeight: root._rail ? VLCStyle.navigationRail_buttonSize : VLCStyle.buttonHeightNavigationPane
 
-                leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
+                leftPadding: root.safeAreaLeftMargin + (root._rail ? (VLCStyle.navigationRail_width - VLCStyle.icon_banner) / 2
+                                                                   : VLCStyle.margin_xsmall)
                 rightPadding: root.safeAreaRightMargin
 
-                leftInset: root.safeAreaLeftMargin + implicitLeftInset
-                rightInset: root.safeAreaRightMargin + implicitRightInset
+                leftInset: root.safeAreaLeftMargin + (root._rail ? root._railInset : implicitLeftInset)
+                rightInset: root.safeAreaRightMargin + (root._rail ? root._railInset : implicitRightInset)
 
                 iconTxt: VLCIcons.settings
                 text: qsTr("Preferences")

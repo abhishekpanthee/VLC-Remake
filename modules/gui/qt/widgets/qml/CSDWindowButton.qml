@@ -37,7 +37,10 @@ T.Button {
     readonly property bool _paintHovered: control.hovered || showHovered
 
     padding: 0
-    width: VLCStyle.dp(40, VLCStyle.scale)
+    // VLC redesign (Figma: topbar window buttons are 36x24)
+    width: VLCStyle.titleBar_windowButtonWidth
+
+    readonly property bool _systemIcons: (MainCtx.osName === MainCtx.Windows) && (MainCtx.osVersion >= 10)
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -80,7 +83,8 @@ T.Button {
                 return VLCIcons.fontFamily
             }
 
-            font.pixelSize: VLCStyle.icon_CSD
+            // the redesign window glyphs are drawn in a 24px box
+            font.pixelSize: control._systemIcons ? VLCStyle.icon_CSD : VLCStyle.icon_normal
             color: control.color
         }
     }

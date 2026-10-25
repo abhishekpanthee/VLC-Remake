@@ -30,8 +30,14 @@ Row {
 
     width: implicitWidth
 
-    property color color: theme.fg.primary
-    property color hoverColor: theme.bg.primary.alpha(0.5)
+    // VLC redesign (Figma: topbar): Dark/FG/A2 glyphs
+    property color color: viewTheme.fg.secondary
+    property color hoverColor: viewTheme.fg.secondary.alpha(0.2)
+
+    ColorContext {
+        id: viewTheme
+        colorSet: ColorContext.View
+    }
 
     readonly property bool useWinIcons: ((MainCtx.osName === MainCtx.Windows)&&(MainCtx.osVersion >= 10))
 

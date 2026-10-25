@@ -582,6 +582,8 @@ void SystemPalette::makeLightPalette()
     //menubar
     {
         C::ColorSet CS = C::MenuBar;
+        // title bar (Figma: topbar)
+        setColor(CS, C::Bg, C::Secondary, C::Normal, lBgA2);
         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(lBgA2, 0.0));
         setColor(CS, C::Bg, C::Primary, C::Focused, lBgA2);
         setColor(CS, C::Bg, C::Primary, C::Hovered, lBgA2);
@@ -810,6 +812,8 @@ void SystemPalette::makeDarkPalette()
     //menubar
     {
         C::ColorSet CS = C::MenuBar;
+        // title bar (Figma: topbar, Dark/BG/A3)
+        setColor(CS, C::Bg, C::Secondary, C::Normal, dBgA3);
         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(dBgA1, 0.0));
         setColor(CS, C::Bg, C::Primary, C::Focused, dBgA1);
         setColor(CS, C::Bg, C::Primary, C::Hovered, dBgA1);
