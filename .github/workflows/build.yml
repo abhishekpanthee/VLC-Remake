@@ -134,8 +134,9 @@ jobs:
           cd ml
           meson setup build --prefix=/usr -Dlibvlc=disabled -Dtests=disabled -Dbuildtype=release
           ninja -C build
-          sudo ninja -C build install
+          # install for the package first: "sudo ninja install" leaves root owned logs
           DESTDIR="$GITHUB_WORKSPACE/stage" ninja -C build install
+          sudo ninja -C build install
 
       - name: Build VLC
         run: |
