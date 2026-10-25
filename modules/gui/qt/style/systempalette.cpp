@@ -654,9 +654,10 @@ void SystemPalette::makeLightPalette()
     //slider
     {
         C::ColorSet CS = C::Slider;
-        setColor(CS, C::Bg, C::Primary, C::Normal, lBgA3);
-        setColor(CS, C::Bg, C::Primary, C::Focused, lBgA4);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, lBgA4);
+        // the track must stand out on the control bar (Light/BG/A3)
+        setColor(CS, C::Bg, C::Primary, C::Normal, lBgA1);
+        setColor(CS, C::Bg, C::Primary, C::Focused, lBgB1);
+        setColor(CS, C::Bg, C::Primary, C::Hovered, lBgB1);
         setColor(CS, C::Bg, C::Secondary, C::Normal, accentBg);
 
         setColor(CS, C::Fg, C::Primary, C::Normal, accent);
