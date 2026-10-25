@@ -243,8 +243,7 @@ FocusScope{
         anchors.top: root.top
         anchors.leftMargin:  root._sideMargin
 
-        implicitWidth: resumeVisible ? resumeDialog.implicitWidth
-                                     : logoGroup.implicitWidth
+        implicitWidth: logoGroup.implicitWidth
 
         implicitHeight: {
             if (root.resumeVisible) {
@@ -267,7 +266,8 @@ FocusScope{
 
             anchors.fill: parent
 
-            visible: (root._showTopBar && root.resumeVisible === false)
+            // VLC redesign: the resume prompt floats at the bottom (ResumeDialog)
+            visible: root._showTopBar
 
             implicitHeight: VLCStyle.icon_banner + VLCStyle.margin_xxsmall * 2
             implicitWidth: backBtn.implicitWidth + logo.implicitWidth + VLCStyle.margin_xxsmall

@@ -151,6 +151,8 @@ public:
     Q_PROPERTY(bool ratechangable READ isRateChangable NOTIFY rateChangableChanged FINAL)
 
     Q_PROPERTY(bool canRestorePlayback READ canRestorePlayback NOTIFY playbackRestoreQueried FINAL)
+    // VLC redesign: the position playback can be restored to (invalid if unknown)
+    Q_PROPERTY(VLCTime restorePlaybackTime READ restorePlaybackTime NOTIFY playbackRestoreQueried FINAL)
 
     // meta
     Q_PROPERTY(QString title READ getTitle NOTIFY currentMetaChanged FINAL)
@@ -333,6 +335,7 @@ public slots:
     void updatePositionFromTimer();
     void updateTimeFromTimer();
     bool canRestorePlayback() const;
+    VLCTime restorePlaybackTime() const;
     void restorePlaybackPos();
     void openVLsub();
     void acknowledgeRestoreCallback();

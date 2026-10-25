@@ -121,6 +121,7 @@ public:
 
     SharedInputItem    m_currentItem;
     bool            m_canRestorePlayback = false;
+    VLCTime         m_restorePlaybackTime;
 
     int             m_capabilities = 0;
 
