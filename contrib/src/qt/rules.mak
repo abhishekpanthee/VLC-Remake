@@ -75,6 +75,12 @@ ifdef HAVE_CROSS_COMPILE
 QTBASE_CONFIG += -DQT_QMAKE_DEVICE_OPTIONS:STRING=CROSS_COMPILE=$(HOST)-
 endif
 
+ifdef HAVE_MACOSX
+# VLC Remake: Qt's Vulkan support on macOS needs MoltenVK (not in the
+# contribs); the Qt interface renders with Metal there
+QTBASE_CONFIG += -DFEATURE_vulkan=OFF
+endif
+
 ifdef HAVE_WIN32
 QTBASE_CONFIG += -DFEATURE_style_fusion=OFF
 # Enable direct2d, but do not build the direct2d platform plugin:
