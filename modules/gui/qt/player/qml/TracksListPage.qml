@@ -115,14 +115,40 @@ ColumnLayout {
 
         currentIndex: root.currentTab
 
-        TrackColumn {
-            title: qsTr("Embedded Tracks")
-            tracksModel: Player.videoTracks
-            menuIcon: VLCIcons.add
-            menuText: qsTr("Add")
-            onMenuAction: (menuPos) => {
-                DialogsProvider.loadVideoFile()
+        // Figma: video tab, tracks then the video settings
+        ColumnLayout {
+            spacing: 0
+
+            TrackColumn {
+                Layout.fillWidth: true
+                Layout.preferredHeight: VLCStyle.dp(150, VLCStyle.scale)
+
+                title: qsTr("Embedded Tracks")
+                tracksModel: Player.videoTracks
+                menuIcon: VLCIcons.add
+                menuText: qsTr("Add")
+                onMenuAction: (menuPos) => {
+                    DialogsProvider.loadVideoFile()
+                }
             }
+
+            Widgets.SubtitleLabel {
+                Layout.fillWidth: true
+                Layout.leftMargin: VLCStyle.dp(28, VLCStyle.scale)
+                Layout.topMargin: VLCStyle.margin_small
+                Layout.bottomMargin: VLCStyle.margin_xsmall
+
+                text: qsTr("Video Settings")
+                color: theme.fg.secondary
+                font.pixelSize: VLCStyle.fontSize_normal
+            }
+
+            VideoSettingRow { label: qsTr("Zoom"); choices: Player.zoom }
+            VideoSettingRow { label: qsTr("Aspect Ratio"); choices: Player.aspectRatio }
+            VideoSettingRow { label: qsTr("Crop"); choices: Player.crop }
+            VideoSettingRow { label: qsTr("Deinterlace"); choices: Player.deinterlace }
+
+            Item { Layout.fillHeight: true }
         }
         TrackColumn {
             title: qsTr("Embedded Tracks")
@@ -154,6 +180,59 @@ ColumnLayout {
         font.pixelSize: VLCStyle.fontSize_normal
 
         onClicked: DialogsProvider.prefsDialog()
+    }
+
+    // Figma: label (14px Dark/FG/A3) and a 220px dropdown, for a player
+    // variable choice list (zoom, aspect ratio, crop...)
+    component VideoSettingRow: RowLayout {
+        id: settingRow
+
+        required property string label
+        required property var choices
+
+        property string current: ""
+
+        Layout.fillWidth: true
+        Layout.leftMargin: VLCStyle.margin_large
+        Layout.rightMargin: VLCStyle.margin_large
+        Layout.preferredHeight: VLCStyle.dp(48, VLCStyle.scale)
+
+        spacing: VLCStyle.margin_small
+
+        // keep track of the checked choice to display it
+        Repeater {
+            model: settingRow.choices
+            delegate: Item {
+                required property bool checked
+                required property string display
+
+                visible: false
+                onCheckedChanged: if (checked) settingRow.current = display
+                Component.onCompleted: if (checked) settingRow.current = display
+            }
+        }
+
+        T.Label {
+            Layout.fillWidth: true
+            text: settingRow.label
+            color: theme.fg.secondary
+            font.pixelSize: VLCStyle.fontSize_normal
+            elide: Text.ElideRight
+        }
+
+        Widgets.ComboBoxExt {
+            Layout.preferredWidth: VLCStyle.dp(220, VLCStyle.scale)
+            Layout.preferredHeight: VLCStyle.dp(40, VLCStyle.scale)
+
+            model: settingRow.choices
+            textRole: "display"
+            displayText: settingRow.current
+            font.pixelSize: VLCStyle.fontSize_normal
+
+            onActivated: (index) => settingRow.choices.toggleIndex(index)
+
+            Accessible.name: settingRow.label
+        }
     }
 
     component TabHeaderButton: T.AbstractButton {
